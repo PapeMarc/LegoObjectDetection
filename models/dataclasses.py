@@ -48,7 +48,7 @@ class ColoredShape:
     def __str__(self):
         if self.pos is not None:
             x, y = self.pos
-            return f'{self.color} {self.shapeType} at ({x:.2f}, {y:.2f})'
+            return f'{self.color} {self.shapeType} Brick at ({x:.2f}, {y:.2f})'
         else:
-            return f'{self.color} {self.shapeType} at undifined Position'
+            return f'{self.color} {self.shapeType} Brick at undifined Position'
 

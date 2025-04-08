@@ -3,15 +3,15 @@ import os
 
 def writeShapeListToConsole(shape_list):
     os.system("cls")
-    print('\n------------------------------------------------')
+    print('\n----------------------------------------------------')
     time = datetime.now().time()
     time_str = f'| {time.hour}:{time.minute}:{time.second} |'
     
     shape_count = len(shape_list)
     if shape_count > 0:
-        print(f'{time_str} Detected following {len(shape_list)} Object(s): ')
+        print(f'{time_str}  Detected following {len(shape_list)} Object(s): ')
     else:
-        print(f'{time_str} There were no Objects found ')
+        print(f'{time_str}  There were no Objects found ')
 
     placeholder = '|'
     for i in range(len(time_str)-2):
@@ -35,8 +35,8 @@ def writeShapeListToConsole(shape_list):
 
         left_column = "".join(left_column_list)
 
-        print(f'{left_column} {shape_list[i]} ')
+        print(f'{left_column}  {shape_list[i]} ')
 
     print(placeholder)
 
-    print('------------------------------------------------\n')
+    print('----------------------------------------------------\n')
