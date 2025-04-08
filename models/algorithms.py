@@ -114,55 +114,59 @@ def getMostLikelyType(color, typeA, typeB, roi):
     greatest_type = max(typeA, typeB)
     path = os.path.join('assets', 'templates_s')
 
-    if greatest_type is ShapeType.TWO_X_FOUR:
+    match greatest_type:
+        case ShapeType.TWO_X_FOUR:
 
-        # Specifying the threshold-value for the Colors Red and Green
-        match color:
-            case LegoColor.RED:
-                thresh_2x4 = 0.4
-                thresh_2x2 = 0.3
-            case LegoColor.GREEN:
-                thresh_2x4 = 0.34
-                thresh_2x2 = 0.29
+            # Specifying the threshold-value for the Colors Red and Green
+            match color:
+                case LegoColor.RED:
+                    thresh_2x4 = 0.4
+                    thresh_2x2 = 0.3
+                case LegoColor.GREEN:
+                    thresh_2x4 = 0.34
+                    thresh_2x2 = 0.29
 
-        filename = f'2x4_{color.__str__().lower()}.jpg'
-        match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_2x4)
+            filename = f'2x4_{color.__str__().lower()}.jpg'
+            match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_2x4)
 
-        if match:
-            return ShapeType.TWO_X_FOUR
-        else:
+            if match:
+                return ShapeType.TWO_X_FOUR
+
             filename = f'2x2_{color.__str__().lower()}.jpg'
             match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_2x2)
+
             if match:
                 return ShapeType.TWO_X_TWO
-            else:
-                return None
 
-    elif greatest_type is ShapeType.ONE_X_FOUR:
+            return None
 
-        # Specifying the threshold-value for the Colors Blue and Yellow
-        match color:
-            case LegoColor.YELLOW:
-                thresh_1x4 = 0.47
-                thresh_1x3 = 0.45
-            case LegoColor.BLUE:
-                thresh_1x4 = 0.345
-                thresh_1x3 = 0.3
+        case ShapeType.ONE_X_FOUR:
 
-        filename = f'1x4_{color.__str__().lower()}.jpg'
-        match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_1x4)
+            # Specifying the threshold-value for the Colors Blue and Yellow
+            match color:
+                case LegoColor.YELLOW:
+                    thresh_1x4 = 0.47
+                    thresh_1x3 = 0.45
+                case LegoColor.BLUE:
+                    thresh_1x4 = 0.345
+                    thresh_1x3 = 0.3
 
-        if match:
-            return ShapeType.ONE_X_FOUR
-        else: 
+            filename = f'1x4_{color.__str__().lower()}.jpg'
+            match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_1x4)
+
+            if match:
+                return ShapeType.ONE_X_FOUR
+
             filename = f'1x3_{color.__str__().lower()}.jpg'
             match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_1x3)
+
             if match:
                 return ShapeType.ONE_X_THREE
-            else:
-                return None
-    else:
-        return None
+            
+            return None
+        
+        case _:
+            return None
     
 # Perplexity AI gefragt: 
 # 1. "Was ist Template Matching und wie funktioniert es in OpenCV?" und
@@ -200,7 +204,7 @@ def applyTemplateMatching(roi, path_to_template, rotation_range, step, threshold
     roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY) if len(roi.shape) == 3 else roi
     
     max_val = -1
-    best_angle = 0
+    #best_angle = 0
 
     roi_padded = pad_roi_if_needed(roi_gray, template)
 
