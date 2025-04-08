@@ -19,8 +19,18 @@ class ShapeType(Enum):
     TWO_X_FOUR = 5 # greatest possible logical value
 
     def __str__(self):
-        return super.__str__(self).split('.')[1].split(':')[0]
+        #name_upper = super.__str__(self).split('.')[1].split(':')[0]
+        #name_replaced = name_lower.replace('ONE', '1')
+        #name_replaced = name_replaced.replace('TWO', '2')
+        #name_replaced = name_replaced.replace('THREE', '3')
+        #name_replaced = name_replaced.replace('FOUR', '4')
+        #name_replaced = name_replaced.replace('_', ' ')
+        #name_lower = name_upper.lower()
+
+        #return name_lower
     
+        return super.__str__(self).split('.')[1].split(':')[0]
+
     def __lt__(self, other):
         if other.__class__ is ShapeType:
             return self.value < other.value

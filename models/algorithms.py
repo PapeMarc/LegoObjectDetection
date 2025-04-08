@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 from utils import imageConverter as ic
@@ -111,7 +112,7 @@ def determineShapeTypes(coloredShapes, image):
 def getMostLikelyType(color, typeA, typeB, roi):
 
     greatest_type = max(typeA, typeB)
-    path = 'assets/templates_s/'
+    path = os.path.join('assets', 'templates_s')
 
     if greatest_type is ShapeType.TWO_X_FOUR:
 
@@ -124,9 +125,9 @@ def getMostLikelyType(color, typeA, typeB, roi):
                 thresh_2x4 = 0.34
                 thresh_2x2 = 0.29
 
-        if applyTemplateMatching(roi, f'{path}2x4_{color.__str__().lower()}.jpg', (-180, 180), 10, thresh_2x4):
+        if applyTemplateMatching(roi, os.path.join(path, f'2x4_{color.__str__().lower()}.jpg'), (-180, 180), 10, thresh_2x4):
             return ShapeType.TWO_X_FOUR
-        elif applyTemplateMatching(roi, f'{path}2x2_{color.__str__().lower()}.jpg', (-180, 180), 10, thresh_2x2):
+        elif applyTemplateMatching(roi, os.path.join(path, f'2x2_{color.__str__().lower()}.jpg'), (-180, 180), 10, thresh_2x2):
             return ShapeType.TWO_X_TWO
         else:
             return None
@@ -142,9 +143,9 @@ def getMostLikelyType(color, typeA, typeB, roi):
                 thresh_1x4 = 0.345
                 thresh_1x3 = 0.3
 
-        if applyTemplateMatching(roi, f'{path}1x4_{color.__str__().lower()}.jpg', (-180, 180), 10, thresh_1x4):
+        if applyTemplateMatching(roi, os.path.join(path, f'1x4_{color.__str__().lower()}.jpg'), (-180, 180), 10, thresh_1x4):
             return ShapeType.ONE_X_FOUR
-        elif applyTemplateMatching(roi, f'{path}1x3_{color.__str__().lower()}.jpg', (-180, 180), 10, thresh_1x3):
+        elif applyTemplateMatching(roi, os.path.join(path, f'1x3_{color.__str__().lower()}.jpg'), (-180, 180), 10, thresh_1x3):
             return ShapeType.ONE_X_THREE
         else:
             return None
