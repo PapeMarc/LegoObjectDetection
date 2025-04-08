@@ -125,30 +125,42 @@ def getMostLikelyType(color, typeA, typeB, roi):
                 thresh_2x4 = 0.34
                 thresh_2x2 = 0.29
 
-        if applyTemplateMatching(roi, os.path.join(path, f'2x4_{color.__str__().lower()}.jpg'), (-180, 180), 10, thresh_2x4):
+        filename = f'2x4_{color.__str__().lower()}.jpg'
+        match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_2x4)
+
+        if match:
             return ShapeType.TWO_X_FOUR
-        elif applyTemplateMatching(roi, os.path.join(path, f'2x2_{color.__str__().lower()}.jpg'), (-180, 180), 10, thresh_2x2):
-            return ShapeType.TWO_X_TWO
         else:
-            return None
+            filename = f'2x2_{color.__str__().lower()}.jpg'
+            match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_2x2)
+            if match:
+                return ShapeType.TWO_X_TWO
+            else:
+                return None
 
     elif greatest_type is ShapeType.ONE_X_FOUR:
 
         # Specifying the threshold-value for the Colors Blue and Yellow
         match color:
             case LegoColor.YELLOW:
-                thresh_1x4 = 0.43
-                thresh_1x3 = 0.37
+                thresh_1x4 = 0.47
+                thresh_1x3 = 0.45
             case LegoColor.BLUE:
                 thresh_1x4 = 0.345
                 thresh_1x3 = 0.3
 
-        if applyTemplateMatching(roi, os.path.join(path, f'1x4_{color.__str__().lower()}.jpg'), (-180, 180), 10, thresh_1x4):
+        filename = f'1x4_{color.__str__().lower()}.jpg'
+        match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_1x4)
+
+        if match:
             return ShapeType.ONE_X_FOUR
-        elif applyTemplateMatching(roi, os.path.join(path, f'1x3_{color.__str__().lower()}.jpg'), (-180, 180), 10, thresh_1x3):
-            return ShapeType.ONE_X_THREE
-        else:
-            return None
+        else: 
+            filename = f'1x3_{color.__str__().lower()}.jpg'
+            match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_1x3)
+            if match:
+                return ShapeType.ONE_X_THREE
+            else:
+                return None
     else:
         return None
     
