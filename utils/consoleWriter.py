@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 
 def writeShapeListToConsole(shape_list):
-    #os.system("cls")
+    os.system("cls")
     print('\n----------------------------------------------------')
     time = datetime.now().time()
     time_str = f'| {time.hour}:{time.minute}:{time.second} |'

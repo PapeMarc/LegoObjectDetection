@@ -81,7 +81,7 @@ def determineShapeTypes(coloredShapes, image, color_masks):
         img_h, img_w = image.shape[:2]
 
         # calculating and applying the offset if possible
-        offset = 10
+        offset = 25
         if x >= offset & x <= img_w - offset:
             x_minus_offset = x - offset
             x_plus_offset = x + offset
@@ -209,12 +209,11 @@ def applyTemplateMatching(roi, path_to_template, threshold, angle):
     padded_roi = pad_roi_if_needed(rotated_roi, template)
     
     h, w = padded_roi.shape[0:2]
-    print(f'padded roi shape: w={w}, h={h}')
     
     result = cv2.matchTemplate(padded_roi, template, cv2.TM_CCOEFF_NORMED)
     max_val = cv2.minMaxLoc(result)[1]
     
-    print(f'Max Value: {max_val}')
+    #print(f'Max Value: {max_val}')
 
     # determine the boolean Value
     return max_val >= threshold
