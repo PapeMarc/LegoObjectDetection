@@ -29,6 +29,9 @@ class Program:
         try:
             capture = deviceManager.getVideoCapture(1)
 
+            capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+            capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
             while True:
                 frameAvailable, frame = capture.read()
                 if not frameAvailable:
@@ -41,7 +44,7 @@ class Program:
 
                 # Opening and Closing for replacing pixels 
                 # with a Saturation below 70 with black
-                color_seperated = alg.colorSegmentation(
+                _, color_seperated = alg.colorSegmentation(
                     frame_cropped, 5,
                     np.array([0, 75, 0]), 
                     np.array([255, 255, 255])
@@ -49,12 +52,12 @@ class Program:
                 cv2.imshow("Color seperated", color_seperated)
 
                 # Using color specific Segmentation for later identifying the ROIs
-                blue_seperated = alg.colorSegmentation(
+                blue_mask, blue_seperated = alg.colorSegmentation(
                     color_seperated, 3,
                     np.array([105, 100, 0]), 
                     np.array([170, 255, 255])
                 )
-                green_seperated = alg.colorSegmentation(
+                green_mask, green_seperated = alg.colorSegmentation(
                     color_seperated, 3,
                     np.array([50, 27, 0]), 
                     np.array([100, 255, 131])
@@ -63,12 +66,12 @@ class Program:
                 # Perplexity AI gefragt:
                 # Wie kann ich unter zuhilfenahme der OpenCV Bibliothek in der Programmiersprache Python, 
                 # zwei von maskierte Bilder zusammenführen?
-                red_seperated_hue_upper = alg.colorSegmentation(
+                _, red_seperated_hue_upper = alg.colorSegmentation(
                     color_seperated, 1,
                     np.array([140, 0, 0]), 
                     np.array([255, 255, 255])
                 )
-                red_seperated_hue_lower = alg.colorSegmentation(
+                _, red_seperated_hue_lower = alg.colorSegmentation(
                     color_seperated, 1,
                     np.array([0, 0, 0]), 
                     np.array([3, 255, 255])
@@ -77,18 +80,21 @@ class Program:
                                         red_seperated_hue_lower)
                 
                 # Opening and Closing again on the seperated image to get rid of the flickering
-                red_seperated = alg.colorSegmentation(
+                red_mask, red_seperated = alg.colorSegmentation(
                     red_seperated, 5,
                     np.array([0, 0, 0]), 
                     np.array([255, 255, 255])
                 )
 
 
-                yellow_seperated = alg.colorSegmentation(
+                yellow_mask, yellow_seperated = alg.colorSegmentation(
                     color_seperated, 3,
                     np.array([11, 50, 0]), 
                     np.array([30, 255, 255])
                 )
+
+                color_masks = {LegoColor.BLUE: blue_mask, LegoColor.GREEN: green_mask, 
+                         LegoColor.RED: red_mask, LegoColor.YELLOW: yellow_mask}
 
                 combined = ui.combineImages(np.array([blue_seperated, green_seperated]), 
                                     np.array([red_seperated, yellow_seperated]), 3) 
@@ -110,7 +116,7 @@ class Program:
                 shapes = alg.determineShapePositions(shapes, frame_cropped)
 
                 # identifying the Shape Types
-                shapes = alg.determineShapeTypes(shapes, frame_cropped)
+                shapes = alg.determineShapeTypes(shapes, frame_cropped, color_masks)
 
                 # Write Shape-informations to the console
                 consoleWriter.writeShapeListToConsole(shapes)

@@ -19,7 +19,7 @@ def colorSegmentation(img, kernalSize, lower, higher):
     mask = cv2.inRange(hsv, lower, higher)
     result = openAndClose(img, mask, kernalSize)
 
-    return result
+    return mask, result
 
 
 def get_color_rois(masked_blue, masked_green, masked_red, masked_yellow):
@@ -73,7 +73,7 @@ def filterShapesByPixelCount(shapes, pixelCount):
 
     return filtered
 
-def determineShapeTypes(coloredShapes, image):
+def determineShapeTypes(coloredShapes, image, color_masks):
     for coloredShape in coloredShapes:
         
         # Getting the ROI from the original Image
@@ -81,7 +81,7 @@ def determineShapeTypes(coloredShapes, image):
         img_h, img_w = image.shape[:2]
 
         # calculating and applying the offset if possible
-        offset = 5
+        offset = 10
         if x >= offset & x <= img_w - offset:
             x_minus_offset = x - offset
             x_plus_offset = x + offset
@@ -92,14 +92,16 @@ def determineShapeTypes(coloredShapes, image):
 
         if (not x_minus_offset is None) & (not y_minus_offset is None):
             roi = image[y_minus_offset:y_plus_offset+h, x_minus_offset:x_plus_offset+w]
+            roi_mask = color_masks[coloredShape.color][y_minus_offset:y_plus_offset+h, x_minus_offset:x_plus_offset+w]
 
         roi = image[y:y+h, x:x+w]
+        roi_mask = color_masks[coloredShape.color][y:y+h, x:x+w]
 
         # identifying the most likely Type for the Shape
         if coloredShape.color in [LegoColor.BLUE, LegoColor.YELLOW]:
-            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.ONE_X_FOUR, ShapeType.ONE_X_THREE, roi)
+            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.ONE_X_FOUR, ShapeType.ONE_X_THREE, roi, roi_mask)
         else:
-            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.TWO_X_FOUR, ShapeType.TWO_X_TWO, roi)
+            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.TWO_X_FOUR, ShapeType.TWO_X_TWO, roi, roi_mask)
         
         # saving the identified Type into the Shape
         if identifiedType is None:
@@ -109,10 +111,12 @@ def determineShapeTypes(coloredShapes, image):
             
     return coloredShapes
 
-def getMostLikelyType(color, typeA, typeB, roi):
+def getMostLikelyType(color, typeA, typeB, roi, roi_mask):
 
     greatest_type = max(typeA, typeB)
     path = os.path.join('assets', 'd02_templates_s')
+
+    angle = getMinBBoxAngle(roi_mask) # (inverted angle for reversing rotation of the ROI)
 
     match greatest_type:
         case ShapeType.TWO_X_FOUR:
@@ -127,13 +131,13 @@ def getMostLikelyType(color, typeA, typeB, roi):
                     thresh_2x2 = 0.29
 
             filename = f'2x4_{color.__str__().lower()}.jpg'
-            match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_2x4)
+            match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_2x4, angle)
 
             if match:
                 return ShapeType.TWO_X_FOUR
 
             filename = f'2x2_{color.__str__().lower()}.jpg'
-            match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_2x2)
+            match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_2x2, angle)
 
             if match:
                 return ShapeType.TWO_X_TWO
@@ -148,17 +152,17 @@ def getMostLikelyType(color, typeA, typeB, roi):
                     thresh_1x4 = 0.47
                     thresh_1x3 = 0.45
                 case LegoColor.BLUE:
-                    thresh_1x4 = 0.345
-                    thresh_1x3 = 0.3
+                    thresh_1x4 = 0.4
+                    thresh_1x3 = 0.4
 
             filename = f'1x4_{color.__str__().lower()}.jpg'
-            match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_1x4)
+            match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_1x4, angle)
 
             if match:
                 return ShapeType.ONE_X_FOUR
 
             filename = f'1x3_{color.__str__().lower()}.jpg'
-            match = applyTemplateMatching(roi, os.path.join(path, filename), (-180, 180), 10, thresh_1x3)
+            match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_1x3, angle)
 
             if match:
                 return ShapeType.ONE_X_THREE
@@ -195,37 +199,28 @@ def getMostLikelyType(color, typeA, typeB, roi):
 #    dass die Größe des Templates wieder kleiner bzw. gleich groß ist. Folgende Frage an dich: kann 
 #    das hinsichtlich des template-matchings funktionieren?
 
-import cv2
-import numpy as np
-
-def applyTemplateMatching(roi, path_to_template, rotation_range, step, threshold):
-    # Load Template and convert ROI and the Template to a Grayscale Image
+def applyTemplateMatching(roi, path_to_template, threshold, angle):
+    
+    # Load Template and convert both to Grayscale
     template = cv2.imread(path_to_template, cv2.IMREAD_GRAYSCALE)
     roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY) if len(roi.shape) == 3 else roi
     
-    max_val = -1
-    #best_angle = 0
-
-    roi_padded = pad_roi_if_needed(roi_gray, template)
-
-    # Rotate Template for all possible Areas
-    for angle in np.arange(rotation_range[0], rotation_range[1], step):
-        # Rotate Template and cut it to original size
-        rotated_template = rotate_template(template, angle)
-        
-        # Apply Template Matching
-        result = cv2.matchTemplate(roi_padded, rotated_template, cv2.TM_CCOEFF_NORMED)
-        current_max = cv2.minMaxLoc(result)[1]
-        
-        if current_max > max_val:
-            max_val = current_max
-            #best_angle = angle
+    rotated_roi = rotate_image(roi_gray, angle)
+    padded_roi = pad_roi_if_needed(rotated_roi, template)
+    
+    h, w = padded_roi.shape[0:2]
+    print(f'padded roi shape: w={w}, h={h}')
+    
+    result = cv2.matchTemplate(padded_roi, template, cv2.TM_CCOEFF_NORMED)
+    max_val = cv2.minMaxLoc(result)[1]
+    
+    print(f'Max Value: {max_val}')
 
     # determine the boolean Value
     return max_val >= threshold
 
-def rotate_template(template, angle):
-    h, w = template.shape
+def rotate_image(image, angle):
+    h, w = image.shape
     center = (w // 2, h // 2)
     
     # Calculate the rotation Matrix
@@ -240,10 +235,7 @@ def rotate_template(template, angle):
     M[1, 2] += (new_h - h) // 2
     
     # Apply Rotation-Matrix
-    rotated = cv2.warpAffine(template, M, (new_w, new_h), flags=cv2.INTER_CUBIC)
-    
-    # Rescale to original Size
-    return cv2.resize(rotated, (w, h)) if rotated.shape != template.shape else rotated
+    return cv2.warpAffine(image, M, (new_w, new_h), flags=cv2.INTER_CUBIC)
 
 def pad_roi_if_needed(roi, template):
     """Adds black pixels to the ROI, in case that the Template is bigger than the ROI."""
@@ -266,3 +258,28 @@ def pad_roi_if_needed(roi, template):
     )
     
     return padded_roi
+
+# Perplexity AI gefragt:
+# 1. Wie kann ich diesen Winkel in einen repräsentativen Winkel 
+#    zur rotation meines templates für template matching bekommen?
+
+def getMinBBoxAngle(roi_mask):
+    
+    contours, _ = cv2.findContours(roi_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+    for contour in contours:
+        contour_area = cv2.contourArea(contour)
+
+        if(contour_area < 400):
+            continue
+        
+    _, (w_rect, h_rect), angle = cv2.minAreaRect(contour)
+    
+    angle -= 90
+    
+    if w_rect < h_rect:
+        angle += 90
+    
+    angle = angle % 180
+    
+    return angle
