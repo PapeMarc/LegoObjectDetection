@@ -112,7 +112,7 @@ def determineShapeTypes(coloredShapes, image):
 def getMostLikelyType(color, typeA, typeB, roi):
 
     greatest_type = max(typeA, typeB)
-    path = os.path.join('assets', 'templates_s')
+    path = os.path.join('assets', 'd02_templates_s')
 
     match greatest_type:
         case ShapeType.TWO_X_FOUR:
