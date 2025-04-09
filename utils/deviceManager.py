@@ -1,7 +1,7 @@
 import cv2
 
 def getVideoCapture(number):
-    capture = cv2.VideoCapture(0)
+    capture = cv2.VideoCapture(number)
     if not capture.isOpened():
         print(f'Camera {number} could not be opened.')
         exit()

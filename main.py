@@ -4,7 +4,12 @@ import os
 
 def main():
 
-    project_dir = 'C:/Users/marcp/SynologyDrive/FHDW/Unterrichtsmaterial/Semester 6/Projekt Algorithmen/task_solution/LegoObjectDetection'
+    laptop = True
+
+    if laptop:
+        project_dir = 'C:/Users/marcp/Documents/GitHub/LegoObjectDetection'
+    else: 
+        project_dir = 'C:/Users/marcp/SynologyDrive/FHDW/Unterrichtsmaterial/Semester 6/Projekt Algorithmen/task_solution/LegoObjectDetection'
 
     if os.getcwd() != project_dir:
         os.chdir(project_dir)

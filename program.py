@@ -27,7 +27,7 @@ class Program:
     def main(self, args):
 
         try:
-            capture = deviceManager.getVideoCapture(0)
+            capture = deviceManager.getVideoCapture(1)
 
             while True:
                 frameAvailable, frame = capture.read()
