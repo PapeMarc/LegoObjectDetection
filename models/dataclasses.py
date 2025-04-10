@@ -47,18 +47,29 @@ class ColoredShape:
         self.angle = angle
 
     def __str__(self):
+        
+        size = 6 - (len(self.color.__str__()) - 1)
+        colorName = ' ' + self.color.__str__()
+        for i in range(size-1):
+            colorName += ' ' 
+        colorName += '  |'
+            
+        if self.shapeType is ShapeType.UNDEFINED:
+            shape_type = ' ' + self.shapeType.__str__() + '  |'
+        else:
+            shape_type = ' ' + self.shapeType.__str__() + '        |'
+            
         if self.pos is not None:
             x, y = self.pos
             if self.angle != 0:
-                return f'{self.color}, {self.shapeType}, ({x:.2f}, {y:.2f}), {self.angle:.2f}{chr(176)}'
+                return f'{colorName} {shape_type}  ({x:.2f}, {y:.2f})  |  {self.angle:.2f}{chr(176)}'
                 return f'{self.color} {self.shapeType} Brick at ({x:.2f}, {y:.2f}), rotated {self.angle:.2f} {chr(176)}'
-            return f'{self.color}, {self.shapeType}, ({x:.2f}, {y:.2f})'
+            return f'{colorName} {shape_type}  ({x:.2f}, {y:.2f})  |  '
             return f'{self.color} {self.shapeType} Brick at ({x:.2f}, {y:.2f})'
         else:
             if self.angle:
-                return f'{self.color}, {self.shapeType}, {self.angle:.2f}{chr(176)}'
+                return f'{colorName} {shape_type} {self.angle:.2f}{chr(176)}'
                 return f'{self.color} {self.shapeType} Brick at undifined Position, rotated {self.angle:.2f} {chr(176)}'
             else:
-                return f'{self.color}, {self.shapeType}, undifined Position and Rotation'
+                return f'{colorName} {shape_type} undifined Position and Rotation'
                 return f'{self.color} {self.shapeType} Brick at undifined Position and Rotation'
-

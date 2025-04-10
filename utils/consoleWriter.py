@@ -9,7 +9,8 @@ def writeShapeListToConsole(shape_list):
     
     shape_count = len(shape_list)
     if shape_count > 0:
-        print(f'{time_str}  Detected following {len(shape_list)} Object(s): ')
+        print(f'{time_str} Detected {len(shape_list)} Object(s) ')
+        print('-------------------------------------------------------------------')
     else:
         print(f'{time_str}  There were no Objects found ')
 
@@ -18,7 +19,7 @@ def writeShapeListToConsole(shape_list):
         placeholder += ' '
     placeholder += '|'
 
-    print(placeholder)
+    print(placeholder + '          |             |                |       ')
 
     left_column = placeholder
 
@@ -35,8 +36,8 @@ def writeShapeListToConsole(shape_list):
 
         left_column = "".join(left_column_list)
 
-        print(f'{left_column}  {shape_list[i]} ')
+        print(f'{left_column} {shape_list[i]} ')
 
-    print(placeholder)
+    print(placeholder + '          |             |                |       ')
 
     print('-------------------------------------------------------------------\n')
