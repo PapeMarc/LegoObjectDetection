@@ -96,6 +96,7 @@ def determineShapeTypes(coloredShapes, image, color_masks):
 
         roi = image[y:y+h, x:x+w]
         roi_mask = color_masks[coloredShape.color][y:y+h, x:x+w]
+        cv2.imshow('ROI MASK', roi_mask)
         angle = getMinBBoxAngle(roi_mask) # (inverted angle for reversing rotation of the ROI)
         coloredShape.angle = angle
 
@@ -124,11 +125,15 @@ def getMostLikelyType(color, typeA, typeB, roi, angle):
             # Specifying the threshold-value for the Colors Red and Green
             match color:
                 case LegoColor.RED:
-                    thresh_2x4 = 0.4
-                    thresh_2x2 = 0.3
+                    #thresh_2x4 = 0.4
+                    #thresh_2x2 = 0.3
+                    thresh_2x4 = 0.5
+                    thresh_2x2 = 0.5
                 case LegoColor.GREEN:
-                    thresh_2x4 = 0.34
-                    thresh_2x2 = 0.29
+                    #thresh_2x4 = 0.34
+                    #thresh_2x2 = 0.29
+                    thresh_2x4 = 0.5
+                    thresh_2x2 = 0.5
 
             filename = f'2x4_{color.__str__().lower()}.jpg'
             match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_2x4, angle)
@@ -149,11 +154,15 @@ def getMostLikelyType(color, typeA, typeB, roi, angle):
             # Specifying the threshold-value for the Colors Blue and Yellow
             match color:
                 case LegoColor.YELLOW:
-                    thresh_1x4 = 0.47
-                    thresh_1x3 = 0.45
+                    #thresh_1x4 = 0.47
+                    #thresh_1x3 = 0.45
+                    thresh_1x4 = 0.5
+                    thresh_1x3 = 0.5
                 case LegoColor.BLUE:
-                    thresh_1x4 = 0.4
-                    thresh_1x3 = 0.4
+                    #thresh_1x4 = 0.4
+                    #thresh_1x3 = 0.4
+                    thresh_1x4 = 0.5
+                    thresh_1x3 = 0.5
 
             filename = f'1x4_{color.__str__().lower()}.jpg'
             match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_1x4, angle)

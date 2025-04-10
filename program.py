@@ -70,7 +70,7 @@ class Program:
 
                 # Opening and Closing for replacing pixels 
                 # with a Saturation below 70 with black
-                _, color_seperated = alg.colorSegmentation(
+                color_mask, color_seperated = alg.colorSegmentation(
                     frame_cropped, 5,
                     np.array([0, 75, 0]), 
                     np.array([255, 255, 255])
@@ -95,12 +95,13 @@ class Program:
                 # Perplexity AI gefragt:
                 # Wie kann ich unter zuhilfenahme der OpenCV Bibliothek in der Programmiersprache Python, 
                 # zwei von maskierte Bilder zusammenführen?
-                _, red_seperated_hue_upper = alg.colorSegmentation(
+                red_seperated_mask_upper, red_seperated_hue_upper = alg.colorSegmentation(
                     color_seperated, 1,
                     np.array([140, 0, 0]), 
                     np.array([255, 255, 255])
                 )
-                _, red_seperated_hue_lower = alg.colorSegmentation(
+
+                red_seperated_mask_lower, red_seperated_hue_lower = alg.colorSegmentation(
                     color_seperated, 1,
                     np.array([0, 0, 0]), 
                     np.array([3, 255, 255])
@@ -108,8 +109,15 @@ class Program:
                 red_seperated = cv2.add(red_seperated_hue_upper, 
                                         red_seperated_hue_lower)
                 
+                # Adding the black pixels from the mask_lower to the color_mask, to
+                # remove the other colored areas.
+                red_mask = cv2.bitwise_and(color_mask, red_seperated_mask_lower)
+                # Adding the white pixels from the upper mask to get the full 
+                # color spectrum of red.
+                red_mask = cv2.bitwise_or(red_mask, red_seperated_mask_upper)
+                
                 # Opening and Closing again on the seperated image to get rid of the flickering
-                red_mask, red_seperated = alg.colorSegmentation(
+                _, red_seperated = alg.colorSegmentation(
                     red_seperated, 5,
                     np.array([0, 0, 0]), 
                     np.array([255, 255, 255])
