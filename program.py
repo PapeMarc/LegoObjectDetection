@@ -31,10 +31,10 @@ class Program:
                            int(int(args[0]['DEF_REFRESH_RATE']) / 100), 
                            int(int(args[0]['MAX_REFRESH_RATE']) / 100), 
                            lambda placeholder: None)
-        cv2.createTrackbar('Win_O','Control Panel', 0, 1, lambda placeholder: None)
-        cv2.createTrackbar('Win_CS','Control Panel', 0, 1, lambda placeholder: None)
-        cv2.createTrackbar('Win_CC','Control Panel', 0, 1, lambda placeholder: None)
-        cv2.createTrackbar('Win_R','Control Panel', 1, 1, lambda placeholder: None)
+        cv2.createTrackbar('Original','Control Panel', 0, 1, lambda placeholder: None)
+        cv2.createTrackbar('Colors','Control Panel', 0, 1, lambda placeholder: None)
+        cv2.createTrackbar('Channels','Control Panel', 0, 1, lambda placeholder: None)
+        cv2.createTrackbar('Result','Control Panel', 1, 1, lambda placeholder: None)
         
         min_refresh_rate = int(args[0]['MIN_REFRESH_RATE'])
 
@@ -56,10 +56,10 @@ class Program:
                 if refresh_rate == 0:
                     refresh_rate = min_refresh_rate
 
-                show_original = cv2.getTrackbarPos('Win_O','Control Panel') == 1
-                show_color_seperated = cv2.getTrackbarPos('Win_CS','Control Panel') == 1
-                show_color_channels = cv2.getTrackbarPos('Win_CC','Control Panel') == 1
-                show_result = cv2.getTrackbarPos('Win_R','Control Panel') == 1
+                show_original = cv2.getTrackbarPos('Original','Control Panel') == 1
+                show_color_seperated = cv2.getTrackbarPos('Colors','Control Panel') == 1
+                show_color_channels = cv2.getTrackbarPos('Channels','Control Panel') == 1
+                show_result = cv2.getTrackbarPos('Result','Control Panel') == 1
 
                 # Cropping the Image to a Square
                 frame_cropped = imageConverter.getImageCenterSquare(frame)
@@ -168,13 +168,8 @@ class Program:
                 # Draw Shape Positions
                 frame_marked = ui.drawBBoxCenters(frame_marked, shapes, [0,255,0], 2, 10)
 
-                #cv2.putText(
-                #    image, f"{coloredShape.color}, {coloredShape.shapeType}", 
-                #    (x, y-20), 
-                #    cv2.FONT_ITALIC, 
-                #    0.8, 
-                #    ui_color, ui_thickness
-                #)
+                # Draw Shape Information above BBoxes
+                frame_marked = ui.drawInfo(frame_marked, shapes, [0,255,0], 2)
                 
                 if show_result:
                     cv2.imshow('Result', imageConverter.resizeImage(frame_marked, imshow_scale))

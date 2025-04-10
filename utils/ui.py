@@ -70,3 +70,21 @@ def drawBBoxCenters(image, shapes, color, line_thickness, line_length):
         image = printROIMarker(image, center_x, center_y, line_length, color, line_thickness)
 
     return image
+
+def drawInfo(image, shapes, color, line_thickness):
+
+    for i in range(len(shapes)):
+        
+        shape = shapes[i]
+        
+        x,y,w,h = shape.roi
+        
+        cv2.putText(
+            image, f'[{i+1}]', #{shape.color}, {shape.shapeType}
+            (x-5, y-20), 
+            cv2.FONT_ITALIC, 
+            0.8, 
+            color, line_thickness
+        )
+        
+    return image
