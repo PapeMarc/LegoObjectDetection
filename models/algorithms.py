@@ -96,7 +96,7 @@ def determineShapeTypes(coloredShapes, image, color_masks):
 
         roi = image[y:y+h, x:x+w]
         roi_mask = color_masks[coloredShape.color][y:y+h, x:x+w]
-        cv2.imshow('ROI MASK', roi_mask)
+        
         angle = getMinBBoxAngle(roi_mask) # (inverted angle for reversing rotation of the ROI)
         coloredShape.angle = angle
 
@@ -125,15 +125,11 @@ def getMostLikelyType(color, typeA, typeB, roi, angle):
             # Specifying the threshold-value for the Colors Red and Green
             match color:
                 case LegoColor.RED:
-                    #thresh_2x4 = 0.4
-                    #thresh_2x2 = 0.3
-                    thresh_2x4 = 0.5
-                    thresh_2x2 = 0.5
+                    thresh_2x4 = 0.3
+                    thresh_2x2 = 0.14
                 case LegoColor.GREEN:
-                    #thresh_2x4 = 0.34
-                    #thresh_2x2 = 0.29
-                    thresh_2x4 = 0.5
-                    thresh_2x2 = 0.5
+                    thresh_2x4 = 0.15
+                    thresh_2x2 = 0.18
 
             filename = f'2x4_{color.__str__().lower()}.jpg'
             match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_2x4, angle)
@@ -154,15 +150,11 @@ def getMostLikelyType(color, typeA, typeB, roi, angle):
             # Specifying the threshold-value for the Colors Blue and Yellow
             match color:
                 case LegoColor.YELLOW:
-                    #thresh_1x4 = 0.47
-                    #thresh_1x3 = 0.45
-                    thresh_1x4 = 0.5
-                    thresh_1x3 = 0.5
+                    thresh_1x4 = 0.35
+                    thresh_1x3 = 0.3
                 case LegoColor.BLUE:
-                    #thresh_1x4 = 0.4
-                    #thresh_1x3 = 0.4
-                    thresh_1x4 = 0.5
-                    thresh_1x3 = 0.5
+                    thresh_1x4 = 0.35
+                    thresh_1x3 = 0.3
 
             filename = f'1x4_{color.__str__().lower()}.jpg'
             match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_1x4, angle)
@@ -217,12 +209,13 @@ def applyTemplateMatching(roi, path_to_template, threshold, angle):
     rotated_roi = rotate_image(roi_gray, angle)
     padded_roi = pad_roi_if_needed(rotated_roi, template)
     
-    h, w = padded_roi.shape[0:2]
+    #cv2.imshow('TEMPLATE', template)
+    #cv2.imshow('ROI', padded_roi)
     
     result = cv2.matchTemplate(padded_roi, template, cv2.TM_CCOEFF_NORMED)
     max_val = cv2.minMaxLoc(result)[1]
     
-    #print(f'Max Value: {max_val}')
+    #print(f'{path_to_template.split('/')[-1]} - Max Value: {max_val}')
 
     # determine the boolean Value
     return max_val >= threshold
