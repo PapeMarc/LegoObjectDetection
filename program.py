@@ -109,6 +109,7 @@ class Program:
                 red_seperated = cv2.add(red_seperated_hue_upper, 
                                         red_seperated_hue_lower)
                 
+                # https://medium.com/featurepreneur/performing-bitwise-operations-on-images-using-opencv-6fd5c3cd72a7
                 # Adding the black pixels from the mask_lower to the color_mask, to
                 # remove the other colored areas.
                 red_mask = cv2.bitwise_and(color_mask, red_seperated_mask_lower)
