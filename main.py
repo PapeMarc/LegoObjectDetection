@@ -18,12 +18,12 @@ def main():
         os.chdir(project_dir)
 
     program = Program()
-    try:
-        program.main([])
-    except:
-        print("WARNING: An uncatched Exception reached top. Program shutdown.")
-    finally:
-        program.exit()
+#try:
+    program.main([config])
+#except:
+#    print("WARNING: An uncatched Exception reached top. Program shutdown.")
+#finally:
+    program.exit()
 
 if __name__ == "__main__":    
     main()

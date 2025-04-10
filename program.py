@@ -29,8 +29,9 @@ class Program:
         try:
             capture = deviceManager.getVideoCapture(1)
 
-            capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-            capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+            capture.set(cv2.CAP_PROP_FRAME_WIDTH, float(args[0]['CAMERA_WIDTH']))
+            capture.set(cv2.CAP_PROP_FRAME_HEIGHT, float(args[0]['CAMERA_HEIGHT']))
+            imshow_scale = float(args[0]['IMSHOW_SCALE'])
 
             while True:
                 frameAvailable, frame = capture.read()
@@ -40,7 +41,7 @@ class Program:
 
                 # Cropping the Image to a Square
                 frame_cropped = imageConverter.getImageCenterSquare(frame)
-                cv2.imshow("Original", frame_cropped)
+                cv2.imshow("Original", imageConverter.resizeImage(frame_cropped, imshow_scale))
 
                 # Opening and Closing for replacing pixels 
                 # with a Saturation below 70 with black
@@ -49,7 +50,7 @@ class Program:
                     np.array([0, 75, 0]), 
                     np.array([255, 255, 255])
                 )
-                cv2.imshow("Color seperated", color_seperated)
+                cv2.imshow("Color seperated", imageConverter.resizeImage(color_seperated, imshow_scale))
 
                 # Using color specific Segmentation for later identifying the ROIs
                 blue_mask, blue_seperated = alg.colorSegmentation(
@@ -98,7 +99,7 @@ class Program:
 
                 combined = ui.combineImages(np.array([blue_seperated, green_seperated]), 
                                     np.array([red_seperated, yellow_seperated]), 3) 
-                cv2.imshow("Color Segmentation", combined)
+                cv2.imshow("Color Segmentation", imageConverter.resizeImage(combined, imshow_scale))
 
                 # extracting the color-specifc ROIs
                 roi_dict = alg.get_color_rois(blue_seperated,
@@ -135,7 +136,7 @@ class Program:
                 #    ui_color, ui_thickness
                 #)
 
-                cv2.imshow('Result', frame_marked)
+                cv2.imshow('Result', imageConverter.resizeImage(frame_marked, imshow_scale))
 
 
 

@@ -31,3 +31,12 @@ def adjustImageHeights(smaller_image: np.ndarray, larger_image: np.ndarray) -> n
                             interpolation=cv2.INTER_AREA)
     
     return resized_roi
+
+def resizeImage(image, factor) -> np.ndarray:
+    if factor <= 0:
+        return image
+    
+    h, w = image.shape[:2]
+    new_h, new_w = h * factor, w * factor
+    resized = cv2.resize(image, (int(new_w), int(new_h)))
+    return resized
