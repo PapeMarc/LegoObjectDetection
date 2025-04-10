@@ -96,12 +96,14 @@ def determineShapeTypes(coloredShapes, image, color_masks):
 
         roi = image[y:y+h, x:x+w]
         roi_mask = color_masks[coloredShape.color][y:y+h, x:x+w]
+        angle = getMinBBoxAngle(roi_mask) # (inverted angle for reversing rotation of the ROI)
+        coloredShape.angle = angle
 
         # identifying the most likely Type for the Shape
         if coloredShape.color in [LegoColor.BLUE, LegoColor.YELLOW]:
-            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.ONE_X_FOUR, ShapeType.ONE_X_THREE, roi, roi_mask)
+            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.ONE_X_FOUR, ShapeType.ONE_X_THREE, roi, angle)
         else:
-            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.TWO_X_FOUR, ShapeType.TWO_X_TWO, roi, roi_mask)
+            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.TWO_X_FOUR, ShapeType.TWO_X_TWO, roi, angle)
         
         # saving the identified Type into the Shape
         if identifiedType is None:
@@ -111,12 +113,10 @@ def determineShapeTypes(coloredShapes, image, color_masks):
             
     return coloredShapes
 
-def getMostLikelyType(color, typeA, typeB, roi, roi_mask):
+def getMostLikelyType(color, typeA, typeB, roi, angle):
 
     greatest_type = max(typeA, typeB)
     path = os.path.join('assets', 'd02_templates_s')
-
-    angle = getMinBBoxAngle(roi_mask) # (inverted angle for reversing rotation of the ROI)
 
     match greatest_type:
         case ShapeType.TWO_X_FOUR:

@@ -1,4 +1,5 @@
 import cv2
+import os
 import sys
 import numpy as np
 from datetime import datetime
@@ -13,10 +14,8 @@ from models.dataclasses import ColoredShape
 import models.fileConverter as fileConverter
 import models.algorithms as alg
 
-
 class Program:
     def __init__(self):
-        import os
         os.system("cls")
         print("\nProgram initialized.\n")
 
@@ -25,6 +24,19 @@ class Program:
         exit()
 
     def main(self, args):
+
+        cv2.namedWindow('Control Panel')
+        cv2.resizeWindow('Control Panel', 600, 200)
+        cv2.createTrackbar('Refresh Rate','Control Panel', 
+                           int(int(args[0]['DEF_REFRESH_RATE']) / 100), 
+                           int(int(args[0]['MAX_REFRESH_RATE']) / 100), 
+                           lambda placeholder: None)
+        cv2.createTrackbar('Win_O','Control Panel', 0, 1, lambda placeholder: None)
+        cv2.createTrackbar('Win_CS','Control Panel', 0, 1, lambda placeholder: None)
+        cv2.createTrackbar('Win_CC','Control Panel', 0, 1, lambda placeholder: None)
+        cv2.createTrackbar('Win_R','Control Panel', 1, 1, lambda placeholder: None)
+        
+        min_refresh_rate = int(args[0]['MIN_REFRESH_RATE'])
 
         try:
             capture = deviceManager.getVideoCapture(1)
@@ -39,9 +51,22 @@ class Program:
                     print("Frame not available.")
                     break
 
+                # Get Trackbar Values
+                refresh_rate = cv2.getTrackbarPos('Refresh Rate','Control Panel') * 100
+                if refresh_rate == 0:
+                    refresh_rate = min_refresh_rate
+
+                show_original = cv2.getTrackbarPos('Win_O','Control Panel') == 1
+                show_color_seperated = cv2.getTrackbarPos('Win_CS','Control Panel') == 1
+                show_color_channels = cv2.getTrackbarPos('Win_CC','Control Panel') == 1
+                show_result = cv2.getTrackbarPos('Win_R','Control Panel') == 1
+
                 # Cropping the Image to a Square
                 frame_cropped = imageConverter.getImageCenterSquare(frame)
-                cv2.imshow("Original", imageConverter.resizeImage(frame_cropped, imshow_scale))
+                if show_original:
+                    cv2.imshow("Original", imageConverter.resizeImage(frame_cropped, imshow_scale))
+                elif cv2.getWindowProperty("Original", cv2.WND_PROP_VISIBLE) > 0:
+                    cv2.destroyWindow("Original")  
 
                 # Opening and Closing for replacing pixels 
                 # with a Saturation below 70 with black
@@ -50,7 +75,10 @@ class Program:
                     np.array([0, 75, 0]), 
                     np.array([255, 255, 255])
                 )
-                cv2.imshow("Color seperated", imageConverter.resizeImage(color_seperated, imshow_scale))
+                if show_color_seperated:
+                    cv2.imshow("Color seperated", imageConverter.resizeImage(color_seperated, imshow_scale))
+                elif cv2.getWindowProperty("Color seperated", cv2.WND_PROP_VISIBLE) > 0:
+                    cv2.destroyWindow("Color seperated")  
 
                 # Using color specific Segmentation for later identifying the ROIs
                 blue_mask, blue_seperated = alg.colorSegmentation(
@@ -99,8 +127,11 @@ class Program:
 
                 combined = ui.combineImages(np.array([blue_seperated, green_seperated]), 
                                     np.array([red_seperated, yellow_seperated]), 3) 
-                cv2.imshow("Color Segmentation", imageConverter.resizeImage(combined, imshow_scale))
-
+                if show_color_channels:
+                    cv2.imshow("Color Segmentation", imageConverter.resizeImage(combined, imshow_scale))
+                elif cv2.getWindowProperty("Color Segmentation", cv2.WND_PROP_VISIBLE) > 0:
+                    cv2.destroyWindow("Color Segmentation")  
+                    
                 # extracting the color-specifc ROIs
                 roi_dict = alg.get_color_rois(blue_seperated,
                                             green_seperated,
@@ -123,10 +154,10 @@ class Program:
                 consoleWriter.writeShapeListToConsole(shapes)
 
                 # Draw bounding boxes around ROIs
-                frame_marked = ui.drawBoundingBoxes(frame_cropped, shapes, [0,255,0], 1)
+                frame_marked = ui.drawBoundingBoxes(frame_cropped, shapes, [0,255,0], 2)
 
                 # Draw Shape Positions
-                frame_marked = ui.drawBBoxCenters(frame_marked, shapes, [0,255,0], 1, 7)
+                frame_marked = ui.drawBBoxCenters(frame_marked, shapes, [0,255,0], 2, 10)
 
                 #cv2.putText(
                 #    image, f"{coloredShape.color}, {coloredShape.shapeType}", 
@@ -135,12 +166,13 @@ class Program:
                 #    0.8, 
                 #    ui_color, ui_thickness
                 #)
-
-                cv2.imshow('Result', imageConverter.resizeImage(frame_marked, imshow_scale))
-
-
-
-                key = cv2.waitKey(1000)
+                
+                if show_result:
+                    cv2.imshow('Result', imageConverter.resizeImage(frame_marked, imshow_scale))
+                elif cv2.getWindowProperty("Result", cv2.WND_PROP_VISIBLE) > 0:
+                    cv2.destroyWindow("Result")  
+                    
+                key = cv2.waitKey(refresh_rate)
                 if key >= 0:
                     break
         finally:

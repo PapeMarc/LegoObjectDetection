@@ -39,15 +39,18 @@ class ShapeType(Enum):
 
 class ColoredShape:
 
-    def __init__(self, pos, roi, color: LegoColor, shapeType: ShapeType):
+    def __init__(self, pos, roi, color: LegoColor, shapeType: ShapeType, angle):
         self.pos = pos
         self.roi = roi
         self.color = color
         self.shapeType = shapeType
+        self.angle = angle
 
     def __str__(self):
         if self.pos is not None:
             x, y = self.pos
+            if self.angle != 0:
+                return f'{self.color} {self.shapeType} Brick at ({x:.2f}, {y:.2f}), rotated by {self.angle:.2f} degrees'
             return f'{self.color} {self.shapeType} Brick at ({x:.2f}, {y:.2f})'
         else:
             return f'{self.color} {self.shapeType} Brick at undifined Position'
