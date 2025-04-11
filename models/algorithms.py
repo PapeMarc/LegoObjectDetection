@@ -82,12 +82,15 @@ def determineShapeTypes(coloredShapes, color_masks):
         
         # getting the smallest possible BBox
         _, mbb_size, angle = getMinBBox(roi_mask) # (inverted angle for reversing rotation of the ROI)
+        if mbb_size is None or angle is None:
+            continue
         mbb_w, mbb_h = mbb_size
         coloredShape.angle = angle
 
         # identifying the most likely Type for the Shape
         if coloredShape.color in [LegoColor.BLUE, LegoColor.YELLOW]:
             ratio = max(mbb_w, mbb_h) / min(mbb_w, mbb_h)
+            identifiedType = None
             if ratio > 3.5:
                 identifiedType = ShapeType.ONE_X_FOUR
             elif ratio > 2.5: 
@@ -111,13 +114,23 @@ def getMinBBox(roi_mask):
     
     contours, _ = cv2.findContours(roi_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
+    best_contour = None
+    max_area = 0
+            
     for contour in contours:
         contour_area = cv2.contourArea(contour)
 
-        if(contour_area < 400):
+        if(contour_area < 1000):
             continue
         
-    center, size, angle = cv2.minAreaRect(contour)
+        if contour_area > max_area:
+            max_area = contour_area
+            best_contour = contour
+        
+    if best_contour is None:
+        return None, None, None
+        
+    center, size, angle = cv2.minAreaRect(best_contour)
     w, h = size
     
     correctedAngle = angle
@@ -129,7 +142,7 @@ def getMinBBox(roi_mask):
     correctedAngle = correctedAngle % 180
     
     if w == 0 or h == 0:
-        return None, correctedAngle
+        return None, None, correctedAngle
     else:
         return center, size, correctedAngle
     
