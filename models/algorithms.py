@@ -91,7 +91,7 @@ def determineShapeTypes(coloredShapes, color_masks):
         if coloredShape.color in [LegoColor.BLUE, LegoColor.YELLOW]:
             ratio = max(mbb_w, mbb_h) / min(mbb_w, mbb_h)
             identifiedType = None
-            if ratio > 3.2:
+            if ratio > 3.19:
                 identifiedType = ShapeType.ONE_X_FOUR
             elif ratio > 2.5: 
                 identifiedType = ShapeType.ONE_X_THREE
