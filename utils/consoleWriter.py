@@ -8,7 +8,7 @@ def writeShapeListToConsole(shape_list):
     global loop_active
     loop_active = True
     
-    #os.system("cls")
+    os.system("cls")
     print('\n-------------------------------------------------------------------')
     time = datetime.now().time()
     time_str = f'| {time.hour}:{time.minute}:{time.second} |'

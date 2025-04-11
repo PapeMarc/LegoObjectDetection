@@ -40,3 +40,20 @@ def resizeImage(image, factor) -> np.ndarray:
     new_h, new_w = h * factor, w * factor
     resized = cv2.resize(image, (int(new_w), int(new_h)))
     return resized
+
+def tryCutRoiWithOffset(roi, offset, image):
+    x, y, w, h = roi
+    img_h, img_w = image.shape[:2]
+
+    if x >= offset & x <= img_w - offset:
+        x_minus_offset = x - offset
+        x_plus_offset = x + offset
+
+    if y >= offset & y <= img_h-offset:
+        y_minus_offset = y - offset
+        y_plus_offset = y + offset
+
+    if (not x_minus_offset is None) & (not y_minus_offset is None):
+        return image[y_minus_offset:y_plus_offset+h, x_minus_offset:x_plus_offset+w]
+    
+    return image[y:y+h, x:x+w]

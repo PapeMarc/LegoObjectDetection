@@ -15,23 +15,34 @@ import models.fileConverter as fileConverter
 import models.algorithms as alg
 
 class Program:
-    def __init__(self):
+    
+    def __init__(self, args):
         os.system('cls')
+        
+        # Load environment Values
+        self.default_refresh_rate = int(args[0]['DEF_REFRESH_RATE'])
+        self.max_refresh_rate = int(args[0]['MAX_REFRESH_RATE'])
+        self.min_refresh_rate = int(args[0]['MIN_REFRESH_RATE'])
+        self.device_width = float(args[0]['CAMERA_WIDTH'])
+        self.device_height = float(args[0]['CAMERA_HEIGHT'])
+        self.imshow_scale = float(args[0]['IMSHOW_SCALE'])
+        
         consoleWriter.writeStatus('Program initialized.')
 
     def exit(self):
         consoleWriter.writeStatus('Program exited.')
         exit()
 
-    def main(self, args):
-
+    def main(self):
+        
+        # Create Control Panel Window and Trackbars
         cv2.namedWindow('Control Panel')
         cv2.resizeWindow('Control Panel', 600, 200)
         
         # https://www.w3schools.com/python/python_lambda.asp
         cv2.createTrackbar('Refresh Rate','Control Panel', 
-                           int(int(args[0]['DEF_REFRESH_RATE']) / 100), 
-                           int(int(args[0]['MAX_REFRESH_RATE']) / 100), 
+                           int(self.default_refresh_rate / 100), 
+                           int(self.max_refresh_rate / 100), 
                            lambda placeholder: None)
         
         cv2.createTrackbar('Original','Control Panel', 0, 1, lambda placeholder: None)
@@ -39,51 +50,53 @@ class Program:
         cv2.createTrackbar('Channels','Control Panel', 0, 1, lambda placeholder: None)
         cv2.createTrackbar('Result','Control Panel', 1, 1, lambda placeholder: None)
         
-        min_refresh_rate = int(args[0]['MIN_REFRESH_RATE'])
-
         try:
-            deviceWidth, deviceHeight = float(args[0]['CAMERA_WIDTH']), float(args[0]['CAMERA_HEIGHT'])
-            capture = deviceManager.getVideoCapture(1, deviceWidth, deviceHeight)
-            imshow_scale = float(args[0]['IMSHOW_SCALE'])
+            
+            # getting Video Capture
+            capture = deviceManager.getVideoCapture(1, self.device_width, self.device_height)
 
+            # Running through Frames
             while True:
                 frameAvailable, frame = capture.read()
                 if not frameAvailable:
                     consoleWriter.writeError('Frame not available.')
                     break
 
-                # Get Trackbar Values
+                # Reading Trackbar Values
                 refresh_rate = cv2.getTrackbarPos('Refresh Rate','Control Panel') * 100
-                if refresh_rate == 0:
-                    refresh_rate = min_refresh_rate
-
                 show_original = cv2.getTrackbarPos('Original','Control Panel') == 1
                 show_color_seperated = cv2.getTrackbarPos('Colors','Control Panel') == 1
                 show_color_channels = cv2.getTrackbarPos('Channels','Control Panel') == 1
                 show_result = cv2.getTrackbarPos('Result','Control Panel') == 1
+                
+                if refresh_rate == 0:
+                    refresh_rate = self.min_refresh_rate
 
-                # Cropping the Image to a Square
+                # Cropping the Frame to the max possible inner Square
                 frame_cropped = imageConverter.getImageCenterSquare(frame)
-                ui.showImage(frame_cropped, 'Original', imshow_scale, show_original)
+                
+                # Showing the Original Image if enabled
+                ui.showImage(frame_cropped, 'Original', self.imshow_scale, show_original)
 
-                # Opening and Closing for replacing pixels 
-                # with a Saturation below 70 with black
+                # Seperating the colors from the Background using Color Segmentation
+                # and opening and closing
                 color_seperated_mask, color_seperated = alg.colorSegmentation(
                     frame_cropped, 5,
                     np.array([0, 75, 0]), 
                     np.array([255, 255, 255])
                 )
                 
-                ui.showImage(color_seperated, 'Color seperated', imshow_scale, show_color_seperated)
+                # Showing the color seperated Image if enabled
+                ui.showImage(color_seperated, 'Color seperated', self.imshow_scale, show_color_seperated)
 
-                # Using color specific Segmentation for later identifying the ROIs
-                # Seperate Blue
+                # Using color specific Segmentation
+                # Filtering out blue Pixels
                 blue_mask, blue_seperated = alg.colorSegmentation(
                     color_seperated, 3,
                     np.array([105, 100, 0]), 
                     np.array([170, 255, 255])
                 )
-                # Seperate Green
+                # Filtering out green Pixels
                 green_mask, green_seperated = alg.colorSegmentation(
                     color_seperated, 3,
                     np.array([50, 27, 0]), 
@@ -92,7 +105,9 @@ class Program:
 
                 # Perplexity AI gefragt:
                 # Wie kann ich unter zuhilfenahme der OpenCV Bibliothek in der Programmiersprache Python, 
-                # zwei von maskierte Bilder zusammenführen?
+                # zwei maskierte Bilder zusammenführen?
+                
+                # Filtering out red Pixels
                 red_seperated_mask_upper, red_seperated_upper = alg.colorSegmentation(
                     color_seperated, 1,
                     np.array([140, 0, 0]), 
@@ -121,15 +136,15 @@ class Program:
                     np.array([0, 0, 0]), 
                     np.array([255, 255, 255])
                 )
-
-                # Seperate Yellow
+                
+                # Filtering out yellow Pixels
                 yellow_mask, yellow_seperated = alg.colorSegmentation(
                     color_seperated, 3,
                     np.array([11, 50, 0]), 
                     np.array([30, 255, 255])
                 )
 
-                # Save Masks from color seperation
+                # Save color-specific masks for later shape detection
                 color_masks = { 
                     LegoColor.BLUE: blue_mask, 
                     LegoColor.GREEN: green_mask, 
@@ -137,45 +152,45 @@ class Program:
                     LegoColor.YELLOW: yellow_mask
                 }
 
-                # Combine color seperated Images with divider
+                # Combine color seperated Images with a divider
                 combined = ui.combineImages(np.array([blue_seperated, green_seperated]), 
                                             np.array([red_seperated, yellow_seperated]), 3) 
                 
                 # Show color seperated Image when enabled
-                ui.showImage(combined, 'Color Segmentation', imshow_scale, show_color_channels)
+                ui.showImage(combined, 'Color Segmentation', self.imshow_scale, show_color_channels)
                     
-                # extracting the color-specifc ROIs
+                # extracting color-specifc ROIs
                 roi_dict = alg.get_color_rois(blue_seperated,
                                               green_seperated,
                                               red_seperated,
                                               yellow_seperated)
 
                 # Converting ROIs into dataclass ColoredShape
-                shapes = fileConverter.convertRoiDictIntoShapeList(roi_dict)
+                coloredShapes = fileConverter.convertRoiDictIntoColoredShapeList(roi_dict)
 
-                # Filtering out all Shapes with a total pixel Count of 300
-                shapes = alg.filterShapesByPixelCount(shapes, 300)
+                # Filtering out all Shapes with a total pixel Count of 750
+                coloredShapes = alg.filterShapesByPixelCount(coloredShapes, 750)
 
                 # determining the Shapes positions in the unit square
-                shapes = alg.determineShapePositions(shapes, frame_cropped)
+                coloredShapes = alg.determineShapePositions(coloredShapes, frame_cropped)
 
                 # identifying the Shape Types
-                shapes = alg.determineShapeTypes(shapes, frame_cropped, color_masks)
+                coloredShapes = alg.determineShapeTypes(coloredShapes, color_masks)
 
                 # Write Shape-informations to the console
-                consoleWriter.writeShapeListToConsole(shapes)
+                consoleWriter.writeShapeListToConsole(coloredShapes)
 
                 # Draw bounding boxes around ROIs
-                frame_marked = ui.drawBBoxes(frame_cropped, shapes, [0,255,0], 2)
+                frame_marked = ui.drawBBoxes(frame_cropped, coloredShapes, [0,255,0], 2)
 
                 # Draw Shape Positions
-                frame_marked = ui.drawBBoxCenters(frame_marked, shapes, [0,255,0], 2, 10)
+                frame_marked = ui.drawBBoxCenters(frame_marked, coloredShapes, [0,255,0], 2, 10)
 
                 # Draw Shape Information above BBoxes
-                frame_marked = ui.drawInfo(frame_marked, shapes, [0,255,0], 2) 
+                frame_marked = ui.drawInfo(frame_marked, coloredShapes, [0,255,0], 2) 
                     
                 # Show Result when enabled
-                ui.showImage(frame_marked, 'Result', imshow_scale, show_result)
+                ui.showImage(frame_marked, 'Result', self.imshow_scale, show_result)
                     
                 # Quit on User keydown
                 key = cv2.waitKey(refresh_rate)
