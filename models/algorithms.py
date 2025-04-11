@@ -93,7 +93,7 @@ def determineShapeTypes(coloredShapes, color_masks):
             identifiedType = None
             if ratio > 3.19:
                 identifiedType = ShapeType.ONE_X_FOUR
-            elif ratio > 2.5: 
+            elif ratio > 2.4: 
                 identifiedType = ShapeType.ONE_X_THREE
         else:
             ratio = max(mbb_w, mbb_h) / min(mbb_w, mbb_h)
