@@ -19,6 +19,6 @@ if __name__ == '__main__':
         
     except Exception as e:
         consoleWriter.writeError('An uncaught Exception reached top. Program shutdown.', e)
-        
+            
     finally:
         program.exit()
