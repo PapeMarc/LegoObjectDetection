@@ -99,7 +99,7 @@ class Program:
                 # Filtering out blue Pixels
                 blue_mask, blue_seperated = alg.colorSegmentation(
                     color_seperated, 3,
-                    np.array([105, 100, 0]), 
+                    np.array([100, 100, 0]), 
                     np.array([170, 255, 255])
                 )
                 # Filtering out green Pixels
@@ -123,7 +123,7 @@ class Program:
                 red_seperated_mask_lower, red_seperated_lower = alg.colorSegmentation(
                     color_seperated, 1,
                     np.array([0, 0, 0]), 
-                    np.array([3, 255, 255])
+                    np.array([10, 255, 255])
                 )
                 red_seperated = cv2.add(red_seperated_upper, 
                                         red_seperated_lower)
