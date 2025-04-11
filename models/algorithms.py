@@ -15,6 +15,7 @@ def openAndClose(img, mask, kernalSize):
     return result
 
 def colorSegmentation(img, kernalSize, lower, higher):
+    '''lower / higher: [Hue, Sat, Val]'''
     hsv = ic.convertToHSV(img)
     mask = cv2.inRange(hsv, lower, higher)
     result = openAndClose(img, mask, kernalSize)

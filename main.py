@@ -3,6 +3,8 @@ from dotenv import dotenv_values
 import sys
 import os
 
+from utils import consoleWriter
+
 config = dotenv_values(".env")
 
 def main():
@@ -18,7 +20,7 @@ def main():
         program.main([config])
         
     except:
-        print("WARNING: An uncatched Exception reached top. Program shutdown.")
+        consoleWriter.writeError("An uncatched Exception reached top. Program shutdown.")
         
     finally:
         program.exit()

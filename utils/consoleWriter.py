@@ -1,7 +1,13 @@
 from datetime import datetime
 import os
 
+messages = {'messages':[], 'status':[], 'warnings':[], 'errors':[]}
+loop_active = False
+
 def writeShapeListToConsole(shape_list):
+    global loop_active
+    loop_active = True
+    
     os.system("cls")
     print('\n-------------------------------------------------------------------')
     time = datetime.now().time()
@@ -40,4 +46,33 @@ def writeShapeListToConsole(shape_list):
 
     print(placeholder + '          |             |                |       ')
 
+    print('-------------------------------------------------------------------')
+    
+    for messageType in messages:
+        if messageType == 'status':
+            continue
+        for message in messages[messageType]:
+            print(f'| {message}')
+    
     print('-------------------------------------------------------------------\n')
+    
+    
+def writeMessage(message):
+    messages['messages'].append(message)
+    if not loop_active:
+        print(message)
+    
+def writeWarning(message):
+    messages['warnings'].append(f'⚠️ {message}')
+    if not loop_active:
+        print(f'⚠️ {message}')
+    
+def writeError(message):
+    messages['errors'].append(f'❌ {message}')
+    if not loop_active:
+        print(f'❌ {message}')
+        
+def writeStatus(message):
+    messages['status'].append(message)
+    if not loop_active:
+        print(message)
