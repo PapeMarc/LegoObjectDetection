@@ -16,14 +16,14 @@ def main():
 
     program = Program()
     
-    try:
-        program.main([config])
+    #try:
+    program.main([config])
         
-    except:
-        consoleWriter.writeError("An uncatched Exception reached top. Program shutdown.")
+    #except Exception as e:
+    #    consoleWriter.writeError('An uncaught Exception reached top. Program shutdown.', e)
         
-    finally:
-        program.exit()
+    #finally:
+    program.exit()
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     main()

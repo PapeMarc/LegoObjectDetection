@@ -98,14 +98,33 @@ def determineShapeTypes(coloredShapes, image, color_masks):
         roi = image[y:y+h, x:x+w]
         roi_mask = color_masks[coloredShape.color][y:y+h, x:x+w]
         
-        angle = getMinBBoxAngle(roi_mask) # (inverted angle for reversing rotation of the ROI)
-        coloredShape.angle = angle
+        mbb_size, correctedAngle = getMinBBoxAngle(roi_mask) # (inverted angle for reversing rotation of the ROI)
+        
+        if mbb_size != None:
+            mbb_w, mbb_h = mbb_size
+        else:
+            mbb_w = 1
+            mbb_h = 1
+        
+        coloredShape.angle = correctedAngle
 
         # identifying the most likely Type for the Shape
         if coloredShape.color in [LegoColor.BLUE, LegoColor.YELLOW]:
-            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.ONE_X_FOUR, ShapeType.ONE_X_THREE, roi, angle)
+            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.ONE_X_FOUR, ShapeType.ONE_X_THREE, roi, correctedAngle)
+            if identifiedType is None:
+                ratio = max(mbb_w, mbb_h) / min(mbb_w, mbb_h)
+                if ratio > 3.5:
+                    identifiedType = ShapeType.ONE_X_FOUR
+                elif ratio > 2.5: 
+                    identifiedType = ShapeType.ONE_X_THREE
         else:
-            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.TWO_X_FOUR, ShapeType.TWO_X_TWO, roi, angle)
+            identifiedType = getMostLikelyType(coloredShape.color, ShapeType.TWO_X_FOUR, ShapeType.TWO_X_TWO, roi, correctedAngle)
+            if identifiedType is None:
+                ratio = max(mbb_w, mbb_h) / min(mbb_w, mbb_h)
+                if ratio > 1.5:
+                    identifiedType = ShapeType.TWO_X_FOUR
+                elif ratio > 0.5: 
+                    identifiedType = ShapeType.TWO_X_TWO
         
         # saving the identified Type into the Shape
         if identifiedType is None:
@@ -126,11 +145,11 @@ def getMostLikelyType(color, typeA, typeB, roi, angle):
             # Specifying the threshold-value for the Colors Red and Green
             match color:
                 case LegoColor.RED:
-                    thresh_2x4 = 0.3
-                    thresh_2x2 = 0.14
+                    thresh_2x4 = 0.17
+                    thresh_2x2 = 0.17
                 case LegoColor.GREEN:
-                    thresh_2x4 = 0.15
-                    thresh_2x2 = 0.18
+                    thresh_2x4 = 0.19
+                    thresh_2x2 = 0.17
 
             filename = f'2x4_{color.__str__().lower()}.jpg'
             match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_2x4, angle)
@@ -151,11 +170,11 @@ def getMostLikelyType(color, typeA, typeB, roi, angle):
             # Specifying the threshold-value for the Colors Blue and Yellow
             match color:
                 case LegoColor.YELLOW:
-                    thresh_1x4 = 0.35
-                    thresh_1x3 = 0.3
+                    thresh_1x4 = 0.221
+                    thresh_1x3 = 0.25
                 case LegoColor.BLUE:
-                    thresh_1x4 = 0.35
-                    thresh_1x3 = 0.3
+                    thresh_1x4 = 0.3
+                    thresh_1x3 = 0.27
 
             filename = f'1x4_{color.__str__().lower()}.jpg'
             match = applyTemplateMatching(roi, os.path.join(path, filename), thresh_1x4, angle)
@@ -210,13 +229,13 @@ def applyTemplateMatching(roi, path_to_template, threshold, angle):
     rotated_roi = rotate_image(roi_gray, angle)
     padded_roi = pad_roi_if_needed(rotated_roi, template)
     
-    #cv2.imshow('TEMPLATE', template)
-    #cv2.imshow('ROI', padded_roi)
+    cv2.imshow('TEMPLATE', template)
+    cv2.imshow('ROI', padded_roi)
     
     result = cv2.matchTemplate(padded_roi, template, cv2.TM_CCOEFF_NORMED)
     max_val = cv2.minMaxLoc(result)[1]
     
-    #print(f'{path_to_template.split('/')[-1]} - Max Value: {max_val}')
+    print(f'{path_to_template.split('/')[-1]} - Max Value: {max_val}')
 
     # determine the boolean Value
     return max_val >= threshold
@@ -275,13 +294,18 @@ def getMinBBoxAngle(roi_mask):
         if(contour_area < 400):
             continue
         
-    _, (w_rect, h_rect), angle = cv2.minAreaRect(contour)
+    _, size, angle = cv2.minAreaRect(contour)
+    w, h = size
     
-    angle -= 90
+    correctedAngle = angle
+    correctedAngle -= 90
     
-    if w_rect < h_rect:
-        angle += 90
+    if w < h:
+        correctedAngle += 90
     
-    angle = angle % 180
+    correctedAngle = correctedAngle % 180
     
-    return angle
+    if w == 0 or h == 0:
+        return None, correctedAngle
+    else:
+        return size, correctedAngle

@@ -8,7 +8,7 @@ def writeShapeListToConsole(shape_list):
     global loop_active
     loop_active = True
     
-    os.system("cls")
+    #os.system("cls")
     print('\n-------------------------------------------------------------------')
     time = datetime.now().time()
     time_str = f'| {time.hour}:{time.minute}:{time.second} |'
@@ -67,11 +67,16 @@ def writeWarning(message):
     if not loop_active:
         print(f'⚠️ {message}')
     
-def writeError(message):
-    messages['errors'].append(f'❌ {message}')
-    if not loop_active:
-        print(f'❌ {message}')
-        
+def writeError(message, error):
+    if error:
+        messages['errors'].append(f'❌ {message}. Error Message: ', error)
+        if not loop_active:
+            print(f'❌ {message}. Error Message: ', error)
+    else:
+        messages['errors'].append(f'❌ {message}.')
+        if not loop_active:
+            print(f'❌ {message}.')
+            
 def writeStatus(message):
     messages['status'].append(message)
     if not loop_active:
