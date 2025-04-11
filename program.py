@@ -52,8 +52,14 @@ class Program:
         
         try:
             
+            # When no fast refresh rate is needed, the CAP_DSHOW 
+            # Windows Backend is used to locate the Video Caputre Device
+            fast_mode = True
+            if self.min_refresh_rate < 1000:
+                fast_mode = False
+            
             # getting Video Capture
-            capture = deviceManager.getVideoCapture(1, self.device_width, self.device_height)
+            capture = deviceManager.getVideoCapture(1, self.device_width, self.device_height, fast_mode)
 
             # Running through Frames
             while True:

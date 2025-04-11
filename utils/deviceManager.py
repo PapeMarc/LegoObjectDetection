@@ -5,14 +5,17 @@ from utils.consoleWriter import writeMessage
 # ChatGPT gefragt: Wie schaffe ich es, dass ich mein Video Capture schneller finde? 
 # Ich verwende im Moment videocapture(1).
 
-def getVideoCapture(number, deviceWidth, deviceHeight):
+def getVideoCapture(number, deviceWidth, deviceHeight, fastMode):
     '''Opens a new VideoCapture on the requested Video Device.\n 
-       Assuming that windows is the OS. Otherwise it will return None.'''
-        
-    if os.name != 'nt':
-        return None
+       When using Fast-Mode windows is required as the OS.\n 
+       Otherwise it will return None.'''
     
-    capture = cv2.VideoCapture(number, cv2.CAP_DSHOW)
+    if fastMode:
+        if os.name != 'nt':
+            return None
+        capture = cv2.VideoCapture(number, cv2.CAP_DSHOW)
+    else:
+        capture = cv2.VideoCapture(number)
     
     if not capture.isOpened():
         print(f'Camera {number} could not be opened.')
