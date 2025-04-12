@@ -145,35 +145,3 @@ def getMinBBox(roi_mask):
         return None, None, correctedAngle
     else:
         return center, size, correctedAngle
-    
-
-# Perplexity AI gefragt: 
-# 1. "Was ist Template Matching und wie funktioniert es in OpenCV?" und
-# 2.(Folgefrage) "Wie kann ich für eine ROI Template Matching anwenden, 
-#   sodass ein Wahrheitswert entsteht, ob das Template im Bild vorkommt oder nicht?"
-# 3. "Wie kann ich beim Template Matching Rotation berücksichtigen?" (Methode applyTemplateMatching angehangen)
-# def applyTemplateMatching(roi, path_to_template):
-#     # Load Template and convert ROI and the Template to a Grayscale Image
-#     roi_gray = ic.convertToGray(roi)
-#     template_gray = cv2.imread(path_to_template, cv2.IMREAD_GRAYSCALE)
-
-#     # Apply TemplateMatching
-#     result = cv2.matchTemplate(roi_gray, template_gray, cv2.TM_CCOEFF_NORMED)
-
-#     # Determine if there was something found
-#     threshold = 0.8
-#     max_val = cv2.minMaxLoc(result)[1] # Returns: min_val, max_val, min_loc, max_loc
-#     found_something = max_val >= threshold
-
-#     return found_something
-# 4. Ich habe folgendes Problem: Wenn ich mein Objekt in der ROI drehe, kann es passieren, 
-#    dass das Template (rotiert oder nicht) größer, bzw. kleiner ist als die ROI. Da Template 
-#    Matching nur funktioniert, wenn das Bild in dem das Template gesucht wird größer ist als 
-#    das Template selbst, möchte ich das Problem wie folgt lösen: Ich möchte wenn die größe des 
-#    Templates die größe des ROI-Ausschnitts überschreitet, das ROI so mit schwarzen Pixeln auffüllen, 
-#    dass die Größe des Templates wieder kleiner bzw. gleich groß ist. Folgende Frage an dich: kann 
-#    das hinsichtlich des template-matchings funktionieren?
-
-# Perplexity AI gefragt:
-# 1. Wie kann ich diesen Winkel in einen repräsentativen Winkel 
-#    zur rotation meines templates für template matching bekommen?

@@ -2,9 +2,6 @@ import cv2
 import os
 from utils.consoleWriter import writeMessage
 
-# ChatGPT gefragt: Wie schaffe ich es, dass ich mein Video Capture schneller finde? 
-# Ich verwende im Moment videocapture(1).
-
 def getVideoCapture(number, deviceWidth, deviceHeight, fastMode):
     '''Opens a new VideoCapture on the requested Video Device.\n 
        When using Fast-Mode windows is required as the OS.\n 

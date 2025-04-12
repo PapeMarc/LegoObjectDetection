@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class LegoColor(Enum):
     BLUE = 1
     GREEN = 2
@@ -28,8 +27,6 @@ class ShapeType(Enum):
         name_lower = name_replaced.lower()
 
         return name_lower
-    
-        #return super.__str__(self).split('.')[1].split(':')[0]
 
     def __lt__(self, other):
         if other.__class__ is ShapeType:

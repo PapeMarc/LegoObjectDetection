@@ -9,10 +9,6 @@ from utils import imageConverter
 # TEMPLATE MATCHING
 def determineShapeTypesWithTemplateMatching(coloredShapes, image, color_masks):
     for coloredShape in coloredShapes:
-            
-            # Getting the ROI from the original Image
-            x, y, w, h = coloredShape.roi
-            img_h, img_w = image.shape[:2]
 
             # cutting out the roi with an offset when possible
             roi = imageConverter.tryCutRoiWithOffset(coloredShape.roi, 25, image)
@@ -30,7 +26,8 @@ def determineShapeTypesWithTemplateMatching(coloredShapes, image, color_masks):
 
             # identifying the most likely Type for the Shape
             if coloredShape.color in [LegoColor.BLUE, LegoColor.YELLOW]:
-                identifiedType = None #getMostLikelyType(coloredShape.color, ShapeType.ONE_X_FOUR, ShapeType.ONE_X_THREE, roi, correctedAngle)
+                identifiedType = getMostLikelyType(coloredShape.color, ShapeType.ONE_X_FOUR, 
+                                                   ShapeType.ONE_X_THREE, roi, correctedAngle)
                 if identifiedType is None:
                     ratio = max(mbb_w, mbb_h) / min(mbb_w, mbb_h)
                     if ratio > 3.5:
@@ -38,7 +35,8 @@ def determineShapeTypesWithTemplateMatching(coloredShapes, image, color_masks):
                     elif ratio > 2.5: 
                         identifiedType = ShapeType.ONE_X_THREE
             else:
-                identifiedType = None #getMostLikelyType(coloredShape.color, ShapeType.TWO_X_FOUR, ShapeType.TWO_X_TWO, roi, correctedAngle)
+                identifiedType = getMostLikelyType(coloredShape.color, ShapeType.TWO_X_FOUR, 
+                                                   ShapeType.TWO_X_TWO, roi, correctedAngle)
                 if identifiedType is None:
                     ratio = max(mbb_w, mbb_h) / min(mbb_w, mbb_h)
                     if ratio > 1.5:

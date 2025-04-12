@@ -108,10 +108,6 @@ class Program:
                     np.array([50, 27, 0]), 
                     np.array([100, 255, 131])
                 )
-
-                # Perplexity AI gefragt:
-                # Wie kann ich unter zuhilfenahme der OpenCV Bibliothek in der Programmiersprache Python, 
-                # zwei maskierte Bilder zusammenführen?
                 
                 # Filtering out red Pixels
                 red_seperated_mask_upper, red_seperated_upper = alg.colorSegmentation(
