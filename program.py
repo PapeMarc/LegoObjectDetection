@@ -2,7 +2,8 @@ import cv2
 import os
 import sys
 import numpy as np
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 
 from utils import deviceManager
 from utils import imageConverter
@@ -55,22 +56,39 @@ class Program:
             
             # When no fast refresh rate is needed, the CAP_DSHOW 
             # Windows Backend is used to locate the Video Caputre Device
-            fast_mode = True
-            if self.min_refresh_rate < 1000:
-                fast_mode = False
+            fast_mode = self.min_refresh_rate >= 100
             
             # getting Video Capture
             capture = deviceManager.getVideoCapture(self.capture_number, self.device_width, self.device_height, fast_mode)
 
+            last_exec = None
+            refresh_rate = self.default_refresh_rate
+            refresh_rate_timedelta = timedelta(milliseconds=refresh_rate)
+
             # Running through Frames
             while True:
+                
+                if last_exec is None:
+                    last_exec = datetime.now()
+                    consoleWriter.writeStatus('Initial execution.')
+                    
+                exec_diff = datetime.now() - last_exec
+                
+                if exec_diff < refresh_rate_timedelta:
+                    time_to_sleep = refresh_rate_timedelta - exec_diff
+                    time.sleep(time_to_sleep.total_seconds())
+                    continue
+                else:
+                    last_exec = datetime.now()
+                
                 frameAvailable, frame = capture.read()
                 if not frameAvailable:
                     consoleWriter.writeError('Frame not available.')
                     break
-
+                
                 # Reading Trackbar Values
                 refresh_rate = cv2.getTrackbarPos('Refresh Rate','Control Panel') * 100
+                refresh_rate_timedelta = timedelta(milliseconds=refresh_rate)
                 show_original = cv2.getTrackbarPos('Original','Control Panel') == 1
                 show_color_seperated = cv2.getTrackbarPos('Colors','Control Panel') == 1
                 show_color_channels = cv2.getTrackbarPos('Channels','Control Panel') == 1
@@ -78,6 +96,7 @@ class Program:
                 
                 if refresh_rate == 0:
                     refresh_rate = self.min_refresh_rate
+                    refresh_rate_timedelta = timedelta(milliseconds=refresh_rate)
 
                 # Cropping the Frame to the max possible inner Square
                 frame_cropped = imageConverter.getImageCenterSquare(frame)
@@ -196,7 +215,7 @@ class Program:
                 ui.showImage(frame_marked, 'Result', self.imshow_scale, show_result)
                     
                 # Quit on User keydown
-                key = cv2.waitKey(refresh_rate)
+                key = cv2.waitKey(1)
                 if key >= 0:
                     break
                 
