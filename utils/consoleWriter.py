@@ -1,31 +1,33 @@
 from datetime import datetime
 import os
+import cv2
+import numpy as np
 
 messages = {'messages':[], 'status':[], 'warnings':[], 'errors':[]}
 loop_active = False
 
-def writeShapeListToConsole(shape_list):
+def writeShapeListToConsole(shape_list, generateConsoleImage, console_image):
     global loop_active
     loop_active = True
     
     os.system("cls")
-    print('\n-------------------------------------------------------------------')
+    consoleString = '\n-------------------------------------------------------------------\n'
     time = datetime.now().time()
     time_str = f'| {time.hour}:{time.minute}:{time.second} |'
     
     shape_count = len(shape_list)
     if shape_count > 0:
-        print(f'{time_str} Detected {len(shape_list)} Object(s) ')
-        print('-------------------------------------------------------------------')
+        consoleString += f'{time_str} Detected {len(shape_list)} Object(s) \n'
+        consoleString += '-------------------------------------------------------------------\n'
     else:
-        print(f'{time_str}  There were no Objects found ')
+       consoleString += f'{time_str}  There were no Objects found \n'
 
     placeholder = '|'
     for i in range(len(time_str)-2):
         placeholder += ' '
     placeholder += '|'
 
-    print(placeholder + '          |             |                |       ')
+    consoleString += placeholder + '          |             |                |       \n'
 
     left_column = placeholder
 
@@ -42,21 +44,37 @@ def writeShapeListToConsole(shape_list):
 
         left_column = "".join(left_column_list)
 
-        print(f'{left_column} {shape_list[i]} ')
+        consoleString += f'{left_column} {shape_list[i]} \n'
 
-    print(placeholder + '          |             |                |       ')
+    consoleString += placeholder + '          |             |                |       \n'
 
-    print('-------------------------------------------------------------------')
+    consoleString += '-------------------------------------------------------------------\n'
     
     for messageType in messages:
         if messageType == 'status':
             continue
         for message in messages[messageType]:
-            print(f'| {message}')
+            consoleString += f'| {message}\n'
     
-    print('-------------------------------------------------------------------\n')
+    consoleString += '-------------------------------------------------------------------\n\n'
+
+    print(consoleString)
+
+    if generateConsoleImage:
+        if console_image is None:
+            writeWarning('console_image in consoleWriter was None.')
+        line_height = 22
+
+        lines = consoleString.replace('|','').replace(chr(176),' degrees').split('\n')
+
+        y_offset = line_height
+        for line in lines:
+            cv2.putText(console_image, line, (10, y_offset), cv2.FONT_ITALIC, 0.5, [0,255,0], 2)
+            y_offset += line_height
+
+        return console_image
     
-    
+
 def writeMessage(message):
     messages['messages'].append(message)
     if not loop_active:

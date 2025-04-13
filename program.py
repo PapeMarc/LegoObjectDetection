@@ -39,7 +39,7 @@ class Program:
         
         # Create Control Panel Window and Trackbars
         cv2.namedWindow('Control Panel')
-        cv2.resizeWindow('Control Panel', 600, 200)
+        cv2.resizeWindow('Control Panel', 600, 300)
         
         # https://www.w3schools.com/python/python_lambda.asp
         cv2.createTrackbar('Refresh Rate','Control Panel', 
@@ -51,6 +51,7 @@ class Program:
         cv2.createTrackbar('Colors','Control Panel', 0, 1, lambda placeholder: None)
         cv2.createTrackbar('Channels','Control Panel', 0, 1, lambda placeholder: None)
         cv2.createTrackbar('Result','Control Panel', 1, 1, lambda placeholder: None)
+        cv2.createTrackbar('Console','Control Panel', 0, 1, lambda placeholder: None)
         
         try:
             
@@ -93,7 +94,8 @@ class Program:
                 show_color_seperated = cv2.getTrackbarPos('Colors','Control Panel') == 1
                 show_color_channels = cv2.getTrackbarPos('Channels','Control Panel') == 1
                 show_result = cv2.getTrackbarPos('Result','Control Panel') == 1
-                
+                show_console = cv2.getTrackbarPos('Console','Control Panel') == 1
+
                 if refresh_rate == 0:
                     refresh_rate = self.min_refresh_rate
                     refresh_rate_timedelta = timedelta(milliseconds=refresh_rate)
@@ -200,7 +202,10 @@ class Program:
                 coloredShapes = alg.determineShapeTypes(coloredShapes, color_masks)
 
                 # Write Shape-informations to the console
-                consoleWriter.writeShapeListToConsole(coloredShapes)
+                console_height, console_width = 400, 900
+                console_image = np.zeros((console_height, console_width, 3), dtype=np.uint8)
+                console_image = consoleWriter.writeShapeListToConsole(coloredShapes, show_console, console_image)
+                ui.showImage(console_image, 'Console', 1, show_console)
 
                 # Draw bounding boxes around ROIs
                 frame_marked = ui.drawBBoxes(frame_cropped, coloredShapes, [0,255,0], 2)
