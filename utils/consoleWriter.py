@@ -13,7 +13,15 @@ def writeShapeListToConsole(shape_list, generateConsoleImage, console_image):
     os.system("cls")
     consoleString = '\n-------------------------------------------------------------------\n'
     time = datetime.now().time()
-    time_str = f'| {time.hour}:{time.minute}:{time.second} |'
+    hour, minute, second = time.hour, time.minute, time.second
+    if time.hour < 10:
+        hour = f'0{time.hour}'
+    if time.minute < 10:
+        minute = f'0{time.minute}'
+    if time.second < 10:
+        second = f'0{time.second}'
+
+    time_str = f'| {hour}:{minute}:{second} |'
     
     shape_count = len(shape_list)
     if shape_count > 0:
