@@ -82,7 +82,7 @@ def drawInfo(image, shapes, color, line_thickness):
         x,y,w,h = shape.roi
         
         cv2.putText(
-            image, f'[{i+1}]', {shape.color}, {shape.shapeType}
+            image, f'[{i+1}]', {shape.color}, {shape.shapeType},
             (x-5, y-20), 
             cv2.FONT_ITALIC, 
             0.8, 
