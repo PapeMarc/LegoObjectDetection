@@ -3,27 +3,22 @@ from dotenv import dotenv_values
 import sys
 import os
 
+from utils import consoleWriter
+
 config = dotenv_values(".env")
 
-def main():
+project_dir = config['PROJECT_DIR']
 
-    laptop = True
+if os.getcwd() != project_dir:
+    os.chdir(project_dir)
 
-    if laptop:
-        project_dir = config['PROJECT_DIR_LAPTOP']
-    else: 
-        project_dir = config['PROJECT_DIR_HOME_PC']
-
-    if os.getcwd() != project_dir:
-        os.chdir(project_dir)
-
-    program = Program()
+if __name__ == '__main__':
     try:
-        program.main([])
-    except:
-        print("WARNING: An uncatched Exception reached top. Program shutdown.")
+        program = Program([config])
+        program.main()
+        
+    except Exception as e:
+        consoleWriter.writeError('An uncaught Exception reached top. Program shutdown.', e)
+            
     finally:
         program.exit()
-
-if __name__ == "__main__":    
-    main()

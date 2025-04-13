@@ -1,15 +1,22 @@
 from datetime import datetime
 import os
 
+messages = {'messages':[], 'status':[], 'warnings':[], 'errors':[]}
+loop_active = False
+
 def writeShapeListToConsole(shape_list):
+    global loop_active
+    loop_active = True
+    
     os.system("cls")
-    print('\n----------------------------------------------------')
+    print('\n-------------------------------------------------------------------')
     time = datetime.now().time()
     time_str = f'| {time.hour}:{time.minute}:{time.second} |'
     
     shape_count = len(shape_list)
     if shape_count > 0:
-        print(f'{time_str}  Detected following {len(shape_list)} Object(s): ')
+        print(f'{time_str} Detected {len(shape_list)} Object(s) ')
+        print('-------------------------------------------------------------------')
     else:
         print(f'{time_str}  There were no Objects found ')
 
@@ -18,7 +25,7 @@ def writeShapeListToConsole(shape_list):
         placeholder += ' '
     placeholder += '|'
 
-    print(placeholder)
+    print(placeholder + '          |             |                |       ')
 
     left_column = placeholder
 
@@ -35,8 +42,42 @@ def writeShapeListToConsole(shape_list):
 
         left_column = "".join(left_column_list)
 
-        print(f'{left_column}  {shape_list[i]} ')
+        print(f'{left_column} {shape_list[i]} ')
 
-    print(placeholder)
+    print(placeholder + '          |             |                |       ')
 
-    print('----------------------------------------------------\n')
+    print('-------------------------------------------------------------------')
+    
+    for messageType in messages:
+        if messageType == 'status':
+            continue
+        for message in messages[messageType]:
+            print(f'| {message}')
+    
+    print('-------------------------------------------------------------------\n')
+    
+    
+def writeMessage(message):
+    messages['messages'].append(message)
+    if not loop_active:
+        print(message)
+    
+def writeWarning(message):
+    messages['warnings'].append(f'⚠️ {message}')
+    if not loop_active:
+        print(f'⚠️ {message}')
+    
+def writeError(message, error):
+    if error:
+        messages['errors'].append(f'❌ {message}. Error Message: ', error)
+        if not loop_active:
+            print(f'❌ {message}. Error Message: ', error)
+    else:
+        messages['errors'].append(f'❌ {message}.')
+        if not loop_active:
+            print(f'❌ {message}.')
+            
+def writeStatus(message):
+    messages['status'].append(message)
+    if not loop_active:
+        print(message)
