@@ -39,7 +39,7 @@ class Program:
         
         # Create Control Panel Window and Trackbars
         cv2.namedWindow('Control Panel')
-        cv2.resizeWindow('Control Panel', 600, 300)
+        cv2.resizeWindow('Control Panel', 600, 225)
         
         # https://www.w3schools.com/python/python_lambda.asp
         cv2.createTrackbar('Refresh Rate','Control Panel', 
@@ -90,11 +90,11 @@ class Program:
                 # Reading Trackbar Values
                 refresh_rate = cv2.getTrackbarPos('Refresh Rate','Control Panel') * 100
                 refresh_rate_timedelta = timedelta(milliseconds=refresh_rate)
+                show_console = cv2.getTrackbarPos('Console','Control Panel') == 1
                 show_original = cv2.getTrackbarPos('Original','Control Panel') == 1
                 show_color_seperated = cv2.getTrackbarPos('Colors','Control Panel') == 1
                 show_color_channels = cv2.getTrackbarPos('Channels','Control Panel') == 1
                 show_result = cv2.getTrackbarPos('Result','Control Panel') == 1
-                show_console = cv2.getTrackbarPos('Console','Control Panel') == 1
 
                 if refresh_rate == 0:
                     refresh_rate = self.min_refresh_rate
