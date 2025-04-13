@@ -46,12 +46,11 @@ class Program:
                            int(self.default_refresh_rate / 100), 
                            int(self.max_refresh_rate / 100), 
                            lambda placeholder: None)
-        
+        cv2.createTrackbar('Console','Control Panel', 0, 1, lambda placeholder: None)
         cv2.createTrackbar('Original','Control Panel', 0, 1, lambda placeholder: None)
         cv2.createTrackbar('Colors','Control Panel', 0, 1, lambda placeholder: None)
         cv2.createTrackbar('Channels','Control Panel', 0, 1, lambda placeholder: None)
         cv2.createTrackbar('Result','Control Panel', 1, 1, lambda placeholder: None)
-        cv2.createTrackbar('Console','Control Panel', 0, 1, lambda placeholder: None)
         
         try:
             
