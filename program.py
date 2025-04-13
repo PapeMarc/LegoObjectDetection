@@ -26,6 +26,7 @@ class Program:
         self.device_width = float(args[0]['CAMERA_WIDTH'])
         self.device_height = float(args[0]['CAMERA_HEIGHT'])
         self.imshow_scale = float(args[0]['IMSHOW_SCALE'])
+        self.capture_number = int(args[0]['CAPTURE_NUM'])
         
         consoleWriter.writeStatus('Program initialized.')
 
@@ -59,7 +60,7 @@ class Program:
                 fast_mode = False
             
             # getting Video Capture
-            capture = deviceManager.getVideoCapture(1, self.device_width, self.device_height, fast_mode)
+            capture = deviceManager.getVideoCapture(self.capture_number, self.device_width, self.device_height, fast_mode)
 
             # Running through Frames
             while True:
