@@ -110,7 +110,7 @@ class Program:
                 refresh_rate_timedelta = timedelta(milliseconds=refresh_rate)
                 show_console = cv2.getTrackbarPos('Console','Control Panel') == 1
                 show_original = cv2.getTrackbarPos('Original','Control Panel') == 1
-                show_color_seperated = cv2.getTrackbarPos('Colors','Control Panel') == 1
+                show_color_separated = cv2.getTrackbarPos('Colors','Control Panel') == 1
                 show_color_channels = cv2.getTrackbarPos('Channels','Control Panel') == 1
                 show_result = cv2.getTrackbarPos('Result','Control Panel') == 1
 
@@ -127,39 +127,39 @@ class Program:
 
                 # Separating colors from the background using color segmentation with 
                 # morphological operations (opening and closing)
-                color_seperated_mask, color_seperated = alg.colorSegmentation(
+                color_separated_mask, color_separated = alg.colorSegmentation(
                     frame_cropped, 5,
                     np.array([0, 75, 0]), 
                     np.array([255, 255, 255])
                 )
                 
                 # Showing the color-separated image if enabled
-                ui.showImage(color_seperated, 'Color seperated', self.imshow_scale, show_color_seperated)
+                ui.showImage(color_separated, 'Color seperated', self.imshow_scale, show_color_separated)
 
                 # Using color-specific segmentation
                 # Filtering out blue pixels
                 blue_mask, blue_seperated = alg.colorSegmentation(
-                    color_seperated, 3,
+                    color_separated, 3,
                     np.array([100, 100, 0]), 
                     np.array([170, 255, 255])
                 )
                 # Filtering out green pixels
                 green_mask, green_seperated = alg.colorSegmentation(
-                    color_seperated, 3,
+                    color_separated, 3,
                     np.array([50, 27, 0]), 
                     np.array([100, 255, 131])
                 )
                 
                 # Filtering out red pixels (upper range)
                 red_seperated_mask_upper, red_seperated_upper = alg.colorSegmentation(
-                    color_seperated, 1,
+                    color_separated, 1,
                     np.array([140, 0, 0]), 
                     np.array([255, 255, 255])
                 )
 
                 # Filtering out red pixels (lower range)
                 red_seperated_mask_lower, red_seperated_lower = alg.colorSegmentation(
-                    color_seperated, 1,
+                    color_separated, 1,
                     np.array([0, 0, 0]), 
                     np.array([10, 255, 255])
                 )
@@ -169,7 +169,7 @@ class Program:
                 
                 # Adding the black pixels from the lower mask to the color mask
                 # to remove other colored areas
-                red_mask = cv2.bitwise_and(color_seperated_mask, red_seperated_mask_lower)
+                red_mask = cv2.bitwise_and(color_separated_mask, red_seperated_mask_lower)
                 # Adding the white pixels from the upper mask to include the full 
                 # color spectrum of red
                 red_mask = cv2.bitwise_or(red_mask, red_seperated_mask_upper)
@@ -184,7 +184,7 @@ class Program:
                 
                 # Filtering out yellow pixels using color segmentation
                 yellow_mask, yellow_seperated = alg.colorSegmentation(
-                    color_seperated, 3,
+                    color_separated, 3,
                     np.array([11, 50, 0]), 
                     np.array([30, 255, 255])
                 )

@@ -91,7 +91,7 @@ def drawInfo(image, shapes, color, line_thickness):
         
         shape = shapes[i]
         
-        x,y,w,h = shape.roi
+        x, y, _, _ = shape.roi
         
         # Add text annotation with the index number above each ROI
         cv2.putText(
