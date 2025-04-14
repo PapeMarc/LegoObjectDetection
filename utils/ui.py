@@ -31,7 +31,7 @@ def combineImages(images_top, images_bottom, line_thickness):
     return combined
 
 # Draw an "X" marker at the center of a region of interest (ROI)
-def printROIMarker(image, center_x, center_y, offset, ui_color, ui_thickness):
+def drawROIMarker(image, center_x, center_y, offset, ui_color, ui_thickness):
     # First diagonal line
     cv2.line(
         image, 
@@ -80,7 +80,7 @@ def drawBBoxCenters(image, shapes, color, line_thickness, line_length):
         center_y = y + h // 2  
 
         # Draw an "X" marker at the calculated center coordinates
-        image = printROIMarker(image, center_x, center_y, line_length, color, line_thickness)
+        image = drawROIMarker(image, center_x, center_y, line_length, color, line_thickness)
 
     return image
 
