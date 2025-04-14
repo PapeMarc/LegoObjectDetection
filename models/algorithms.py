@@ -131,7 +131,10 @@ def determineShapeTypes(coloredShapes, color_masks):
             elif ratio > 0.9: 
                 identifiedType = ShapeType.TWO_X_TWO
         
-        coloredShape.shapeType = identifiedType if identifiedType else ShapeType.UNDEFINED
+        if identifiedType is None:
+            coloredShape.shapeType = ShapeType.UNDEFINED
+        else:
+            coloredShape.shapeType = identifiedType
             
     return coloredShapes
 
