@@ -41,7 +41,6 @@ class Program:
         cv2.namedWindow('Control Panel')
         cv2.resizeWindow('Control Panel', 600, 225)
         
-        # https://www.w3schools.com/python/python_lambda.asp
         cv2.createTrackbar('Refresh Rate','Control Panel', 
                            int(self.default_refresh_rate / 100), 
                            int(self.max_refresh_rate / 100), 
@@ -145,7 +144,6 @@ class Program:
                 red_seperated = cv2.add(red_seperated_upper, 
                                         red_seperated_lower)
                 
-                # https://medium.com/featurepreneur/performing-bitwise-operations-on-images-using-opencv-6fd5c3cd72a7
                 # Adding the black pixels from the mask_lower to the color_mask, to
                 # remove the other colored areas.
                 red_mask = cv2.bitwise_and(color_seperated_mask, red_seperated_mask_lower)

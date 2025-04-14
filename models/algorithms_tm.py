@@ -6,7 +6,7 @@ from algorithms import getMinBBox
 from dataclasses import LegoColor, ShapeType
 from utils import imageConverter
 
-# TEMPLATE MATCHING
+# Template Matching
 def determineShapeTypesWithTemplateMatching(coloredShapes, image, color_masks):
     for coloredShape in coloredShapes:
 
