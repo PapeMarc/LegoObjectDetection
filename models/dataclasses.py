@@ -60,13 +60,9 @@ class ColoredShape:
             x, y = self.pos
             if self.angle is not None:
                 return f'{colorName} {shape_type}  ({x:.2f}, {y:.2f})  |  {self.angle:.2f}{chr(176)}'
-                return f'{self.color} {self.shapeType} Brick at ({x:.2f}, {y:.2f}), rotated {self.angle:.2f} {chr(176)}'
             return f'{colorName} {shape_type}  ({x:.2f}, {y:.2f})  |  '
-            return f'{self.color} {self.shapeType} Brick at ({x:.2f}, {y:.2f})'
         else:
             if self.angle:
                 return f'{colorName} {shape_type} {self.angle:.2f}{chr(176)}'
-                return f'{self.color} {self.shapeType} Brick at undifined Position, rotated {self.angle:.2f} {chr(176)}'
             else:
                 return f'{colorName} {shape_type} undifined Position and Rotation'
-                return f'{self.color} {self.shapeType} Brick at undifined Position and Rotation'
