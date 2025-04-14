@@ -47,7 +47,7 @@ class Program:
 
     def main(self):
         
-        # Create the Control Panel window and set its size
+        # Create the main UI window for controlling refresh rate and views.
         cv2.namedWindow('Control Panel')
         cv2.resizeWindow('Control Panel', 600, 225)
         
