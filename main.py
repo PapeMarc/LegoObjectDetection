@@ -1,6 +1,5 @@
 from program import Program
 from dotenv import dotenv_values
-import sys
 import os
 
 from utils import consoleWriter

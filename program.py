@@ -1,6 +1,5 @@
 import cv2
 import os
-import sys
 import numpy as np
 import time
 from datetime import datetime, timedelta
@@ -199,7 +198,7 @@ class Program:
                 coloredShapes = alg.determineShapeTypes(coloredShapes, color_masks)
 
                 # Write Shape-informations to the console
-                console_height, console_width = 400, 900
+                console_height, console_width = 500, 900
                 console_image = np.zeros((console_height, console_width, 3), dtype=np.uint8)
                 console_image = consoleWriter.writeShapeListToConsole(coloredShapes, show_console, console_image)
                 ui.showImage(console_image, 'Console', 1, show_console)

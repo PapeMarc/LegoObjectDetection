@@ -1,7 +1,6 @@
 from datetime import datetime
 import os
 import cv2
-import numpy as np
 
 messages = {'messages':[], 'status':[], 'warnings':[], 'errors':[]}
 loop_active = False

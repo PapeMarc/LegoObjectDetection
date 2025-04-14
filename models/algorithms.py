@@ -1,4 +1,3 @@
-import os
 import cv2
 import numpy as np
 from utils import imageConverter as ic
