@@ -39,7 +39,7 @@ Using **OpenCV**, colors and shapes are segmented, classified, and displayed vis
 ### Setup  
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/USERNAME/LegoObjectDetection.git
+   git clone https://github.com/PapeMarc/LegoObjectDetection.git
    cd LegoObjectDetection
    ```
 2. Create and activate a virtual environment (optional but recommended).  
