@@ -69,6 +69,8 @@ You will see:
 - A **Control Panel** with trackbars  
 - Windows for the original frame, color analysis, results, and console  
 
+<img width="70%" alt="image" src="https://github.com/user-attachments/assets/5c91ac95-fbdf-4125-932d-ac121f7921cd" />
+
 The trackbars allow you to control which outputs are visible and the refresh rate.  
 
 ## Possible Extensions  
